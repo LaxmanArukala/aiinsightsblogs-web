@@ -1,6 +1,7 @@
 'use client';
 
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
 import { Box, Container, Grid, Typography, Breadcrumbs, Link as MuiLink, Chip, Avatar, Stack, Paper, Button, Divider, Skeleton, IconButton, Tooltip, CircularProgress } from '@mui/material';
 import Link from 'next/link';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
@@ -25,23 +26,24 @@ import { useAppDispatch, useAppSelector } from '@/src/redux/hooks';
 import { toggleLike, toggleBookmark } from '@/src/redux/slices/blogSlice';
 import { showSnackbar } from '@/src/redux/slices/uiSlice';
 
-interface BlogDetailPageProps { params: Promise<{ slug: string }>; }
+const UUID_LENGTH = 36;
 
-export default function BlogDetailPage({ params }: BlogDetailPageProps) {
-  const resolvedParams = use(params);
-  const { slug } = resolvedParams;
+export default function BlogDetailPage() {
+  const { id: param } = useParams<{ id: string }>();
+  const id = param.substring(0, UUID_LENGTH);
   const dispatch = useAppDispatch();
   const likedBlogs = useAppSelector(s => s.blog.likedBlogs);
   const bookmarkedBlogs = useAppSelector(s => s.blog.bookmarkedBlogs);
 
-  const { data: blog, isLoading } = useQuery({ queryKey: ['blog', slug], queryFn: () => blogService.getBlogBySlug(slug) });
-  const { data: related } = useQuery({ queryKey: ['related', blog?.id, blog?.category.slug], queryFn: () => blogService.getRelatedBlogs(blog!.id, blog!.category.slug), enabled: !!blog });
+  const { data, isLoading } = useQuery({ queryKey: ['blog', id], queryFn: () => blogService.getBlogById(id) });
+  const blog = data?.blog;
+  const related = data?.related ?? [];
 
   const isLiked = blog ? likedBlogs.includes(blog.id) : false;
   const isBookmarked = blog ? bookmarkedBlogs.includes(blog.id) : false;
 
   const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
+    navigator.clipboard.writeText(globalThis.location.href);
     dispatch(showSnackbar({ message: 'Link copied to clipboard!', severity: 'success' }));
   };
 
@@ -95,7 +97,7 @@ export default function BlogDetailPage({ params }: BlogDetailPageProps) {
                         <Stack key={rel.id} direction="row" spacing={2} sx={{ alignItems: 'flex-start' }}>
                           <Box component="img" src={rel.thumbnail} alt={rel.title} sx={{ width: 72, height: 56, borderRadius: 2, objectFit: 'cover', flexShrink: 0 }} />
                           <Box>
-                            <Typography variant="body2" component={Link} href={`/blogs/${rel.slug}`} sx={{ fontWeight: 700, textDecoration: 'none', color: 'text.primary', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.4, mb: 0.5, '&:hover': { color: 'primary.main' } }}>{rel.title}</Typography>
+                            <Typography variant="body2" component={Link} href={`/blogs/${rel.id}-${rel.slug}`} sx={{ fontWeight: 700, textDecoration: 'none', color: 'text.primary', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.4, mb: 0.5, '&:hover': { color: 'primary.main' } }}>{rel.title}</Typography>
                             <Stack direction="row" sx={{ alignItems: 'center', gap: 0.5 }}><AccessTimeIcon sx={{ fontSize: 12, color: 'text.secondary' }} /><Typography variant="caption" color="text.secondary">{rel.readTime} min</Typography></Stack>
                           </Box>
                         </Stack>

@@ -3,7 +3,7 @@ export interface Author {
   name: string;
   avatar: string;
   bio: string;
-  role: string;
+  role?: string;
   twitter?: string;
   linkedin?: string;
 }
@@ -12,7 +12,7 @@ export interface Category {
   id: string;
   name: string;
   slug: string;
-  color: string;
+  color?: string;
   count?: number;
 }
 
@@ -94,6 +94,7 @@ export interface BlogFilters {
   tags: string[];
   sort: SortOption;
   page: number;
+  featured?: boolean;
 }
 
 export interface PaginatedResponse<T> {
@@ -109,4 +110,9 @@ export interface ReviewFormData {
   email: string;
   rating: number;
   content: string;
+}
+
+export interface ArticleDetailResponse {
+  blog: Blog;
+  related: Blog[];
 }

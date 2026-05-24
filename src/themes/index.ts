@@ -23,7 +23,7 @@ const getTheme = (mode: 'light' | 'dark') => {
       divider: mode === 'light' ? '#e2e8f0' : '#334155',
     },
     typography: {
-      fontFamily: '"Inter", "Segoe UI", system-ui, -apple-system, sans-serif',
+      fontFamily: '"Inter", "Arial", sans-serif',
       h1: { fontWeight: 800, lineHeight: 1.2, letterSpacing: '-0.02em' },
       h2: { fontWeight: 700, lineHeight: 1.25, letterSpacing: '-0.015em' },
       h3: { fontWeight: 700, lineHeight: 1.3, letterSpacing: '-0.01em' },

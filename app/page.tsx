@@ -12,11 +12,12 @@ import StatsSection from '@/src/components/home/StatsSection';
 import TestimonialsSection from '@/src/components/home/TestimonialsSection';
 import NewsletterSection from '@/src/components/home/NewsletterSection';
 import { blogService } from '@/src/services/blogService';
-import { testimonials } from '@/src/utils/mockData';
+import { testimonialService } from '@/src/services/testimonialService';
 
 export default function HomePage() {
   const { data: featured, isLoading: featuredLoading } = useQuery({ queryKey: ['featuredBlogs'], queryFn: () => blogService.getFeaturedBlogs() });
   const { data: all, isLoading: allLoading } = useQuery({ queryKey: ['allBlogs'], queryFn: () => blogService.getBlogs({ sort: 'latest' }) });
+  const { data: testimonials = [] } = useQuery({ queryKey: ['testimonials'], queryFn: () => testimonialService.getTestimonials() });
 
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
