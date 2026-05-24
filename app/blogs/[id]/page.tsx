@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { Box, Container, Grid, Typography, Breadcrumbs, Link as MuiLink, Chip, Avatar, Stack, Paper, Button, Divider, Skeleton, IconButton, Tooltip, CircularProgress } from '@mui/material';
+import { Box, Container, Grid, Typography, Breadcrumbs, Link as MuiLink, Chip, Stack, Paper, Button, Divider, Skeleton, IconButton, Tooltip } from '@mui/material';
 import Link from 'next/link';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -50,8 +49,20 @@ export default function BlogDetailPage() {
   if (isLoading) return <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}><Navbar /><Container maxWidth="lg" sx={{ py: 6 }}><Skeleton width={300} height={24} sx={{ mb: 4 }} /><Skeleton width="80%" height={60} sx={{ mb: 4 }} /><Skeleton variant="rectangular" height={400} sx={{ borderRadius: 3 }} /></Container><Footer /></Box>;
   if (!blog) return <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}><Navbar /><Container maxWidth="lg" sx={{ py: 12, textAlign: 'center' }}><Typography variant="h3" sx={{ fontWeight: 700 }} gutterBottom>Article Not Found</Typography><Button variant="contained" component={Link} href="/blogs">Browse All Articles</Button></Container><Footer /></Box>;
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: blog.title,
+    description: blog.excerpt,
+    image: blog.featuredImage,
+    datePublished: blog.publishedAt,
+    publisher: { '@type': 'Organization', name: 'AI Insights Blogs', url: 'https://aiinsightsblogs.com' },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': `https://aiinsightsblogs.com/blogs/${blog.id}-${blog.slug}` },
+  };
+
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Navbar />
       <Box sx={{ bgcolor: 'background.paper', borderBottom: 1, borderColor: 'divider' }}>
         <Container maxWidth="lg" sx={{ pt: 4, pb: 6 }}>
@@ -60,10 +71,7 @@ export default function BlogDetailPage() {
           <Typography variant="h1" sx={{ fontWeight: 800, fontSize: { xs: '2rem', md: '3rem' }, lineHeight: 1.15, letterSpacing: '-0.03em', mb: 3 }}>{blog.title}</Typography>
           <Typography variant="h6" color="text.secondary" sx={{ lineHeight: 1.7, mb: 4 }}>{blog.excerpt}</Typography>
           <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ alignItems: { xs: 'flex-start', sm: 'center' }, justifyContent: 'space-between', gap: 2 }}>
-            <Stack direction="row" sx={{ alignItems: 'center', gap: 2 }}>
-              <Avatar src={blog.author.avatar} sx={{ width: 48, height: 48 }} />
-              <Box><Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{blog.author.name}</Typography><Typography variant="caption" color="text.secondary">{formatDate(blog.publishedAt)}</Typography></Box>
-            </Stack>
+            <Typography variant="caption" color="text.secondary">{formatDate(blog.publishedAt)}</Typography>
             <Stack direction="row" sx={{ alignItems: 'center', gap: 2 }}>
               <Stack direction="row" sx={{ alignItems: 'center', gap: 0.5 }}><AccessTimeIcon sx={{ fontSize: 16, color: 'text.secondary' }} /><Typography variant="body2" color="text.secondary">{blog.readTime} min read</Typography></Stack>
               <Stack direction="row" sx={{ alignItems: 'center', gap: 0.5 }}><VisibilityIcon sx={{ fontSize: 16, color: 'text.secondary' }} /><Typography variant="body2" color="text.secondary">{formatNumber(blog.views)} views</Typography></Stack>

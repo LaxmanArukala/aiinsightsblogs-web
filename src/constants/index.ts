@@ -1,6 +1,6 @@
-export const SITE_NAME = 'AI Insights Hub';
-export const SITE_DESCRIPTION = 'Your premier source for AI news, insights, and in-depth analysis on artificial intelligence, machine learning, and emerging technologies.';
-export const SITE_URL = 'https://aiinsightshub.com';
+export const SITE_NAME = 'AI Insights Blogs';
+export const SITE_DESCRIPTION = 'Your premier destination for deep-dive articles on AI Agents, Large Language Models, and Generative AI. Stay ahead with expert insights, tutorials, and analysis.';
+export const SITE_URL = 'https://aiinsightsblogs.com';
 export const BLOGS_PER_PAGE = 9;
 
 export const SORT_OPTIONS = [

@@ -19,8 +19,18 @@ export default function HomePage() {
   const { data: all, isLoading: allLoading } = useQuery({ queryKey: ['allBlogs'], queryFn: () => blogService.getBlogs({ sort: 'latest' }) });
   const { data: testimonials = [] } = useQuery({ queryKey: ['testimonials'], queryFn: () => testimonialService.getTestimonials() });
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'AI Insights Blogs',
+    url: 'https://aiinsightsblogs.com',
+    description: 'In-depth articles on AI Agents, Large Language Models, and Generative AI.',
+    potentialAction: { '@type': 'SearchAction', target: 'https://aiinsightsblogs.com/blogs?search={search_term_string}', 'query-input': 'required name=search_term_string' },
+  };
+
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Navbar />
       <Box component="main" sx={{ flexGrow: 1 }}>
         <HeroSection featuredBlog={featured?.[0]} />

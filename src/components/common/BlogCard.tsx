@@ -14,7 +14,7 @@ import { formatDate, formatNumber, slugify } from '@/src/utils/formatters';
 import { useAppDispatch, useAppSelector } from '@/src/redux/hooks';
 import { toggleLike, toggleBookmark } from '@/src/redux/slices/blogSlice';
 
-interface BlogCardProps { blog: Blog; compact?: boolean; }
+interface BlogCardProps { readonly blog: Blog; readonly compact?: boolean; }
 
 export default function BlogCard({ blog, compact = false }: BlogCardProps) {
   const dispatch = useAppDispatch();
@@ -34,13 +34,7 @@ export default function BlogCard({ blog, compact = false }: BlogCardProps) {
           <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}><AccessTimeIcon sx={{ fontSize: 14, color: 'text.secondary' }} /><Typography variant="caption" color="text.secondary">{blog.readTime} min</Typography></Stack>
           <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}><VisibilityIcon sx={{ fontSize: 14, color: 'text.secondary' }} /><Typography variant="caption" color="text.secondary">{formatNumber(blog.views)}</Typography></Stack>
         </Stack>
-        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-          <Avatar src={blog.author.avatar} sx={{ width: 28, height: 28 }} />
-          <Box>
-            <Typography variant="caption" sx={{ fontWeight: 600, display: 'block', lineHeight: 1.2 }}>{blog.author.name}</Typography>
-            <Typography variant="caption" color="text.secondary">{formatDate(blog.publishedAt)}</Typography>
-          </Box>
-        </Stack>
+        <Typography variant="caption" color="text.secondary">{formatDate(blog.publishedAt)}</Typography>
       </CardContent>
       <CardActions sx={{ px: 2, pb: 2, pt: 0, justifyContent: 'space-between' }}>
         <Button size="small" endIcon={<ArrowForwardIcon />} component={Link} href={`/blogs/${blog.id}-${slugify(blog.title)}`}>Read More</Button>
