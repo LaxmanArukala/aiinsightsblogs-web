@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { Box, Container, Grid, Typography, Breadcrumbs, Link as MuiLink, Chip, Avatar, Stack, Paper, Button, Divider, Skeleton, IconButton, Tooltip, CircularProgress } from '@mui/material';
 import Link from 'next/link';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
@@ -25,10 +25,11 @@ import { useAppDispatch, useAppSelector } from '@/src/redux/hooks';
 import { toggleLike, toggleBookmark } from '@/src/redux/slices/blogSlice';
 import { showSnackbar } from '@/src/redux/slices/uiSlice';
 
-interface BlogDetailPageProps { params: { slug: string }; }
+interface BlogDetailPageProps { params: Promise<{ slug: string }>; }
 
 export default function BlogDetailPage({ params }: BlogDetailPageProps) {
-  const { slug } = params;
+  const resolvedParams = use(params);
+  const { slug } = resolvedParams;
   const dispatch = useAppDispatch();
   const likedBlogs = useAppSelector(s => s.blog.likedBlogs);
   const bookmarkedBlogs = useAppSelector(s => s.blog.bookmarkedBlogs);
