@@ -21,7 +21,7 @@ import BlogContentRenderer from '@/src/components/blog/BlogContentRenderer';
 import CommentsSection from '@/src/components/comments/CommentsSection';
 import ReviewsSection from '@/src/components/reviews/ReviewsSection';
 import { blogService } from '@/src/services/blogService';
-import { formatDate, formatNumber } from '@/src/utils/formatters';
+import { formatDate, formatNumber, slugify } from '@/src/utils/formatters';
 import { useAppDispatch, useAppSelector } from '@/src/redux/hooks';
 import { toggleLike, toggleBookmark } from '@/src/redux/slices/blogSlice';
 import { showSnackbar } from '@/src/redux/slices/uiSlice';
@@ -110,7 +110,7 @@ export default function BlogDetailPage() {
                             <BlogImage src={rel.thumbnail} alt={rel.title} />
                           </Box>
                           <Box>
-                            <Typography variant="body2" component={Link} href={`/blogs/${rel.id}-${rel.slug}`} sx={{ fontWeight: 700, textDecoration: 'none', color: 'text.primary', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.4, mb: 0.5, '&:hover': { color: 'primary.main' } }}>{rel.title}</Typography>
+                            <Typography variant="body2" component={Link} href={`/blogs/${rel.id}-${slugify(rel.title)}`} sx={{ fontWeight: 700, textDecoration: 'none', color: 'text.primary', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.4, mb: 0.5, '&:hover': { color: 'primary.main' } }}>{rel.title}</Typography>
                             <Stack direction="row" sx={{ alignItems: 'center', gap: 0.5 }}><AccessTimeIcon sx={{ fontSize: 12, color: 'text.secondary' }} /><Typography variant="caption" color="text.secondary">{rel.readTime} min</Typography></Stack>
                           </Box>
                         </Stack>

@@ -19,6 +19,9 @@ export const metadata: Metadata = {
   publisher: SITE_NAME,
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 } },
   alternates: { canonical: SITE_URL },
+  ...(process.env.NEXT_PUBLIC_ADSENSE_ID && {
+    other: { 'google-adsense-account': process.env.NEXT_PUBLIC_ADSENSE_ID },
+  }),
   openGraph: {
     title: `${SITE_NAME} — AI Agents, LLMs & Generative AI`,
     description: SITE_DESCRIPTION,
