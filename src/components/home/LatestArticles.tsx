@@ -1,6 +1,7 @@
 'use client';
 
 import { Box, Container, Grid, Typography, Avatar, Chip, Stack, Button, Paper } from '@mui/material';
+import BlogImage from '@/src/components/common/BlogImage';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import Link from 'next/link';
@@ -20,8 +21,8 @@ export default function LatestArticles({ blogs, isLoading }: LatestArticlesProps
           {isLoading ? Array.from({ length: 6 }).map((_, i) => <Grid size={{ xs: 12, sm: 6, md: 4 }} key={i}><BlogCardSkeleton /></Grid>) : blogs.slice(0, 6).map(blog => (
             <Grid size={{ xs: 12, sm: 6, md: 4 }} key={blog.id}>
               <Paper elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 3, overflow: 'hidden', transition: 'all 0.25s', '&:hover': { borderColor: 'primary.main', boxShadow: 3, transform: 'translateY(-2px)' } }}>
-                <Box sx={{ position: 'relative' }}>
-                  <Box component="img" src={blog.thumbnail} alt={blog.title} sx={{ width: '100%', height: 180, objectFit: 'cover' }} />
+                <Box sx={{ position: 'relative', height: 180, overflow: 'hidden' }}>
+                  <BlogImage src={blog.thumbnail} alt={blog.title} />
                   <Chip label={blog.category.name} size="small" sx={{ position: 'absolute', top: 12, left: 12, bgcolor: blog.category.color, color: 'white', fontWeight: 700, fontSize: '0.7rem' }} />
                 </Box>
                 <Box sx={{ p: 2.5 }}>

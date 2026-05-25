@@ -116,3 +116,10 @@ export interface ArticleDetailResponse {
   blog: Blog;
   related: Blog[];
 }
+
+export interface BlogStats {
+  totalArticles: number;
+  totalViews: number;
+  totalLikes: number;
+  categories: number;
+}

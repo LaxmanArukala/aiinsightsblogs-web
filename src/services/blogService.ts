@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { Blog, BlogFilters, PaginatedResponse, Comment, Review, ArticleDetailResponse } from '@/src/types';
+import type { Blog, BlogFilters, PaginatedResponse, Comment, Review, ArticleDetailResponse, BlogStats } from '@/src/types';
 import type { ApiEnvelope, RawBlog, RawBlogListResponse, RawBlogDetailResponse } from '@/src/types/api';
 import { comments, reviews } from '@/src/utils/mockData';
 import { BLOGS_PER_PAGE } from '@/src/constants';
@@ -88,6 +88,18 @@ export const blogService = {
       if (axios.isAxiosError(err) && err.response?.status === 404) return null;
       throw err;
     }
+  },
+
+  async getStats(): Promise<BlogStats> {
+    const { data: envelope } = await apiClient.get<ApiEnvelope<RawBlogListResponse>>('/api/v1/blogs', {
+      params: { limit: 1000 },
+    });
+    const blogs = envelope.data.data;
+    const totalArticles = envelope.data.meta.total;
+    const totalViews = blogs.reduce((sum, b) => sum + (b.views ?? 0), 0);
+    const totalLikes = blogs.reduce((sum, b) => sum + (b.likes ?? 0), 0);
+    const categories = new Set(blogs.map(b => b.category.slug)).size;
+    return { totalArticles, totalViews, totalLikes, categories };
   },
 
   async getComments(blogId: string): Promise<Comment[]> {

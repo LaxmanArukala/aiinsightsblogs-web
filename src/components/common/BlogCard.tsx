@@ -1,6 +1,7 @@
 'use client';
 
-import { Card, CardMedia, CardContent, CardActions, Box, Typography, Chip, Avatar, Stack, Button, IconButton, Tooltip } from '@mui/material';
+import { Card, CardContent, CardActions, Box, Typography, Chip, Stack, Button, IconButton, Tooltip } from '@mui/material';
+import BlogImage from '@/src/components/common/BlogImage';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -23,8 +24,8 @@ export default function BlogCard({ blog, compact = false }: BlogCardProps) {
 
   return (
     <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', transition: 'transform 0.2s ease, box-shadow 0.2s ease', '&:hover': { transform: 'translateY(-4px)', boxShadow: 6 } }}>
-      <Box sx={{ position: 'relative', overflow: 'hidden' }}>
-        <CardMedia component="img" height={compact ? 160 : 200} image={blog.thumbnail} alt={blog.title} sx={{ transition: 'transform 0.3s ease', '&:hover': { transform: 'scale(1.05)' } }} />
+      <Box sx={{ position: 'relative', overflow: 'hidden', height: compact ? 160 : 200, flexShrink: 0 }}>
+        <BlogImage src={blog.thumbnail} alt={blog.title} sx={{ transition: 'transform 0.3s ease', '&:hover': { transform: 'scale(1.05)' } }} />
         <Chip label={blog.category.name} size="small" sx={{ position: 'absolute', top: 12, left: 12, bgcolor: blog.category.color, color: 'white', fontWeight: 700, fontSize: '0.7rem' }} />
       </Box>
       <CardContent sx={{ flexGrow: 1, pb: 1 }}>

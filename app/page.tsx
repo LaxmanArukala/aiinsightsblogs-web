@@ -33,7 +33,7 @@ export default function HomePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Navbar />
       <Box component="main" sx={{ flexGrow: 1 }}>
-        <HeroSection featuredBlog={featured?.[0]} />
+        <HeroSection />
         <TrendingTopics />
         <FeaturedBlogs blogs={featured ?? []} isLoading={featuredLoading} />
         <StatsSection />

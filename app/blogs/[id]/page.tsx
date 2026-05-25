@@ -15,6 +15,7 @@ import TwitterIcon from '@mui/icons-material/Twitter';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import { useQuery } from '@tanstack/react-query';
 import Navbar from '@/src/components/layout/Navbar';
+import BlogImage from '@/src/components/common/BlogImage';
 import Footer from '@/src/components/layout/Footer';
 import BlogContentRenderer from '@/src/components/blog/BlogContentRenderer';
 import CommentsSection from '@/src/components/comments/CommentsSection';
@@ -88,7 +89,9 @@ export default function BlogDetailPage() {
         <Container maxWidth="xl">
           <Grid container spacing={5}>
             <Grid size={{ xs: 12, lg: 8 }}>
-              <Box component="img" src={blog.featuredImage} alt={blog.title} sx={{ width: '100%', borderRadius: 3, mb: 5, maxHeight: 480, objectFit: 'cover', boxShadow: 4 }} />
+              <Box sx={{ width: '100%', borderRadius: 3, mb: 5, height: 480, overflow: 'hidden', boxShadow: 4 }}>
+                <BlogImage src={blog.featuredImage} alt={blog.title} />
+              </Box>
               <BlogContentRenderer content={blog.content} />
               <Divider sx={{ my: 5 }} />
               <ReviewsSection blogId={blog.id} />
@@ -103,7 +106,9 @@ export default function BlogDetailPage() {
                     <Stack spacing={2.5} divider={<Divider />}>
                       {related.map(rel => (
                         <Stack key={rel.id} direction="row" spacing={2} sx={{ alignItems: 'flex-start' }}>
-                          <Box component="img" src={rel.thumbnail} alt={rel.title} sx={{ width: 72, height: 56, borderRadius: 2, objectFit: 'cover', flexShrink: 0 }} />
+                          <Box sx={{ width: 72, height: 56, borderRadius: 2, overflow: 'hidden', flexShrink: 0 }}>
+                            <BlogImage src={rel.thumbnail} alt={rel.title} />
+                          </Box>
                           <Box>
                             <Typography variant="body2" component={Link} href={`/blogs/${rel.id}-${rel.slug}`} sx={{ fontWeight: 700, textDecoration: 'none', color: 'text.primary', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.4, mb: 0.5, '&:hover': { color: 'primary.main' } }}>{rel.title}</Typography>
                             <Stack direction="row" sx={{ alignItems: 'center', gap: 0.5 }}><AccessTimeIcon sx={{ fontSize: 12, color: 'text.secondary' }} /><Typography variant="caption" color="text.secondary">{rel.readTime} min</Typography></Stack>

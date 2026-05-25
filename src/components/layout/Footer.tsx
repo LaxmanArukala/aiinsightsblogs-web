@@ -5,14 +5,13 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import GitHubIcon from '@mui/icons-material/GitHub';
-import RssFeedIcon from '@mui/icons-material/RssFeed';
 import Link from 'next/link';
 import { SITE_NAME, SITE_DESCRIPTION } from '@/src/constants';
 
 const footerLinks: Record<string, { label: string; href: string }[]> = {
-  Platform: [{ label: 'Home', href: '/' }, { label: 'Blogs', href: '/blogs' }, { label: 'About Us', href: '/about' }],
+  Platform: [{ label: 'Home', href: '/' }, { label: 'Blogs', href: '/blogs' }, { label: 'About Us', href: '/about' }, { label: 'Contact', href: '/contact' }],
   Categories: [{ label: 'AI Agents', href: '/blogs?category=ai-agents' }, { label: 'LLMs', href: '/blogs?category=llms' }, { label: 'Generative AI', href: '/blogs?category=generative-ai' }],
-  Company: [{ label: 'About', href: '/about' }, { label: 'Team', href: '/about#team' }],
+  Legal: [{ label: 'About', href: '/about' }, { label: 'Privacy Policy', href: '/privacy-policy' }, { label: 'Terms & Conditions', href: '/terms-and-conditions' }],
 };
 
 export default function Footer() {
@@ -54,6 +53,10 @@ export default function Footer() {
         <Divider sx={{ my: 4 }} />
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
           <Typography variant="body2" color="text.secondary">© 2025 {SITE_NAME}. All rights reserved.</Typography>
+          <Stack direction="row" spacing={3}>
+            <MuiLink component={Link} href="/privacy-policy" underline="hover" sx={{ color: 'text.secondary', fontSize: '0.8rem', '&:hover': { color: 'primary.main' } }}>Privacy Policy</MuiLink>
+            <MuiLink component={Link} href="/terms-and-conditions" underline="hover" sx={{ color: 'text.secondary', fontSize: '0.8rem', '&:hover': { color: 'primary.main' } }}>Terms & Conditions</MuiLink>
+          </Stack>
         </Box>
       </Container>
     </Box>
