@@ -1,6 +1,6 @@
 import axios from 'axios';
 import type { Blog, BlogFilters, PaginatedResponse, Comment, Review, ArticleDetailResponse, BlogStats } from '@/src/types';
-import type { ApiEnvelope, RawBlog, RawBlogListResponse, RawBlogDetailResponse } from '@/src/types/api';
+import type { ApiEnvelope, RawBlog, RawBlogListResponse, RawBlogDetailResponse, RawTag } from '@/src/types/api';
 import { comments, reviews } from '@/src/utils/mockData';
 import { BLOGS_PER_PAGE } from '@/src/constants';
 import apiClient from './apiClient';
