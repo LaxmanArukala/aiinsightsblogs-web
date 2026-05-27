@@ -7,41 +7,34 @@ import apiClient from './apiClient';
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-const CATEGORY_COLORS: Record<string, string> = {
-  'machine-learning': '#8b5cf6',
-  'deep-learning':    '#0ea5e9',
-  'nlp':              '#10b981',
-  'data-science':     '#f59e0b',
-  'ai-ethics':        '#ef4444',
-  'computer-vision':  '#ec4899',
-};
-
 function mapBlog(raw: RawBlog): Blog {
   return {
     id:            raw.id,
     slug:          raw.slug,
     title:         raw.title,
-    excerpt:       raw.excerpt,
-    content:       raw.content,
-    thumbnail:     raw.thumbnail,
-    featuredImage: raw.featured_image,
-    category: {
+    excerpt:       raw.excerpt ?? '',
+    content:       raw.content ?? '',
+    thumbnail:     raw.thumbnail ?? '',
+    featuredImage: raw.featured_image ?? '',
+    category: raw.category ? {
       id:    raw.category.id,
       name:  raw.category.name,
       slug:  raw.category.slug,
-      color: CATEGORY_COLORS[raw.category.slug] ?? '#0ea5e9',
-    },
-    tags:        raw.tags,
-    author:      raw.author,
+      color: raw.category.color ?? '#0ea5e9',
+    } : { id: '', name: 'General', slug: 'general', color: '#0ea5e9' },
+    tags:        Array.isArray(raw.tags)
+      ? raw.tags.filter((t): t is RawTag => typeof t === 'object' && t !== null)
+      : [],
+    author:      raw.author ?? { id: '', name: 'AI Insights Blogs', avatar: '', bio: '' },
     publishedAt: raw.published_at,
-    readTime:    raw.read_time,
-    views:       raw.views,
-    likes:       raw.likes,
-    bookmarks:   raw.bookmarks,
-    featured:    raw.featured,
-    trending:    raw.trending,
-    rating:      parseFloat(raw.rating),
-    reviewCount: raw.review_count,
+    readTime:    raw.read_time ?? 5,
+    views:       raw.views ?? 0,
+    likes:       raw.likes ?? 0,
+    bookmarks:   raw.bookmarks ?? 0,
+    featured:    raw.featured ?? false,
+    trending:    raw.trending ?? false,
+    rating:      Number.parseFloat(raw.rating) || 0,
+    reviewCount: raw.review_count ?? 0,
   };
 }
 

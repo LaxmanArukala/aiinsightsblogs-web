@@ -4,8 +4,8 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   images: { unoptimized: true },
-  env: {
-    NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  experimental: {
+    optimizePackageImports: ['@mui/material', '@mui/icons-material'],
   },
 };
 

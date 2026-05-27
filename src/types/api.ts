@@ -24,6 +24,22 @@ export interface RawCategory {
   id: string;
   name: string;
   slug: string;
+  color?: string;
+}
+
+export interface RawCategoryFull {
+  id: string;
+  name: string;
+  slug: string;
+  color: string;
+  blog_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RawCategoryListResponse {
+  data: RawCategoryFull[];
+  meta: RawMeta;
 }
 
 export interface RawTag {

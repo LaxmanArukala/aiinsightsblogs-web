@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Box, Container, Grid, Typography, TextField, Button, Chip, Stack, MenuItem, Select, FormControl, InputLabel, Pagination, Paper, Drawer, IconButton, InputAdornment, CircularProgress, Tooltip, Fade } from '@mui/material';
+import { Box, Container, Grid, Typography, TextField, Button, Stack, MenuItem, Select, FormControl, InputLabel, Pagination, Paper, Drawer, IconButton, InputAdornment } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import TuneIcon from '@mui/icons-material/Tune';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
@@ -13,12 +13,20 @@ import Footer from '@/src/components/layout/Footer';
 import BlogCard from '@/src/components/common/BlogCard';
 import BlogCardSkeleton from '@/src/components/common/BlogCardSkeleton';
 import { blogService } from '@/src/services/blogService';
-import { categories, tags } from '@/src/utils/mockData';
-import { SORT_OPTIONS, BLOGS_PER_PAGE } from '@/src/constants';
-import type { SortOption } from '@/src/types';
+import { categoryService } from '@/src/services/categoryService';
+import { categories as fallbackCategories, tags } from '@/src/utils/mockData';
+import { SORT_OPTIONS } from '@/src/constants';
+import type { Category, SortOption } from '@/src/types';
 
-const CategoryChip = ({ cat, selected, onClick }: { cat: typeof categories[0]; selected: boolean; onClick: () => void }) => {
+const CategoryChip = ({ cat, selected, onClick }: { cat: Category; selected: boolean; onClick: () => void }) => {
   const [hovered, setHovered] = useState(false);
+  const color = cat.color ?? '#0ea5e9';
+  const hoveredBorderColor = hovered ? color : 'divider';
+  const chipBorderColor = selected ? 'transparent' : hoveredBorderColor;
+  const hoveredBackground = hovered ? `linear-gradient(135deg, ${color}15 0%, ${color}08 100%)` : 'transparent';
+  const chipBackground = selected ? `linear-gradient(135deg, ${color}ee 0%, ${color}cc 100%)` : hoveredBackground;
+  const hoveredTransform = hovered ? 'scale(1.01)' : 'scale(1)';
+  const chipTransform = selected ? 'scale(1.02)' : hoveredTransform;
 
   return (
     <Paper
@@ -37,15 +45,11 @@ const CategoryChip = ({ cat, selected, onClick }: { cat: typeof categories[0]; s
         overflow: 'hidden',
         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         border: '2px solid',
-        borderColor: selected ? 'transparent' : hovered ? cat.color : 'divider',
-        background: selected
-          ? `linear-gradient(135deg, ${cat.color}ee 0%, ${cat.color}cc 100%)`
-          : hovered
-            ? `linear-gradient(135deg, ${cat.color}15 0%, ${cat.color}08 100%)`
-            : 'transparent',
-        transform: selected ? 'scale(1.02)' : hovered ? 'scale(1.01)' : 'scale(1)',
-        boxShadow: selected ? `0 4px 20px ${cat.color}40` : 'none',
-        '&:hover': { boxShadow: `0 2px 12px ${cat.color}20` },
+        borderColor: chipBorderColor,
+        background: chipBackground,
+        transform: chipTransform,
+        boxShadow: selected ? `0 4px 20px ${color}40` : 'none',
+        '&:hover': { boxShadow: `0 2px 12px ${color}20` },
       }}
     >
       <Box
@@ -53,9 +57,9 @@ const CategoryChip = ({ cat, selected, onClick }: { cat: typeof categories[0]; s
           width: 8,
           height: 8,
           borderRadius: '50%',
-          bgcolor: selected ? 'white' : cat.color,
+          bgcolor: selected ? 'white' : color,
           transition: 'all 0.3s ease',
-          boxShadow: selected ? '0 0 8px rgba(255,255,255,0.5)' : `0 0 6px ${cat.color}60`,
+          boxShadow: selected ? '0 0 8px rgba(255,255,255,0.5)' : `0 0 6px ${color}60`,
         }}
       />
       <Box sx={{ flex: 1 }}>
@@ -115,7 +119,15 @@ const TagChip = ({ tag, selected, onClick }: { tag: typeof tags[0]; selected: bo
     return gradients[index % gradients.length];
   };
 
-  const gradient = getTagGradient(parseInt(tag.id) - 1);
+  const gradient = getTagGradient(Number.parseInt(tag.id) - 1);
+  const hoveredTagBorderColor = hovered ? gradient.from : 'divider';
+  const tagBorderColor = selected ? 'transparent' : hoveredTagBorderColor;
+  const hoveredTagBackground = hovered ? `${gradient.from}12` : 'transparent';
+  const tagBackground = selected ? `linear-gradient(135deg, ${gradient.from} 0%, ${gradient.to} 100%)` : hoveredTagBackground;
+  const hoveredTagTransform = hovered ? 'scale(1.03)' : 'scale(1)';
+  const tagTransform = selected ? 'scale(1.05)' : hoveredTagTransform;
+  const hoveredTagBoxShadow = hovered ? `0 1px 6px ${gradient.from}15` : 'none';
+  const tagBoxShadow = selected ? `0 3px 12px ${gradient.from}35` : hoveredTagBoxShadow;
 
   return (
     <Box
@@ -134,14 +146,10 @@ const TagChip = ({ tag, selected, onClick }: { tag: typeof tags[0]; selected: bo
         overflow: 'hidden',
         transition: 'all 0.25s ease',
         border: '1.5px solid',
-        borderColor: selected ? 'transparent' : hovered ? gradient.from : 'divider',
-        background: selected
-          ? `linear-gradient(135deg, ${gradient.from} 0%, ${gradient.to} 100%)`
-          : hovered
-            ? `${gradient.from}12`
-            : 'transparent',
-        transform: selected ? 'scale(1.05)' : hovered ? 'scale(1.03)' : 'scale(1)',
-        boxShadow: selected ? `0 3px 12px ${gradient.from}35` : hovered ? `0 1px 6px ${gradient.from}15` : 'none',
+        borderColor: tagBorderColor,
+        background: tagBackground,
+        transform: tagTransform,
+        boxShadow: tagBoxShadow,
       }}
     >
       {hovered && !selected && (
@@ -181,6 +189,67 @@ const TagChip = ({ tag, selected, onClick }: { tag: typeof tags[0]; selected: bo
   );
 };
 
+interface FiltersContentProps {
+  categories: Category[];
+  selectedCategory: string;
+  onCategoryChange: (slug: string) => void;
+  selectedTags: string[];
+  onTagToggle: (slug: string) => void;
+}
+
+function FiltersContent({ categories, selectedCategory, onCategoryChange, selectedTags, onTagToggle }: Readonly<FiltersContentProps>) {
+  return (
+    <Stack spacing={4}>
+      <Box>
+        <Stack direction="row" sx={{ alignItems: 'center', gap: 1, mb: 2 }}>
+          <AutoAwesomeIcon sx={{ fontSize: 18, color: 'primary.main' }} />
+          <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Categories</Typography>
+        </Stack>
+        <Stack spacing={1}>
+          <Paper
+            elevation={0}
+            onClick={() => onCategoryChange('')}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1.5,
+              p: 1.5,
+              borderRadius: 3,
+              cursor: 'pointer',
+              border: '2px solid',
+              borderColor: selectedCategory === '' ? 'primary.main' : 'divider',
+              background: selectedCategory === '' ? 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)' : 'transparent',
+              transition: 'all 0.3s ease',
+              transform: selectedCategory === '' ? 'scale(1.02)' : 'scale(1)',
+              boxShadow: selectedCategory === '' ? '0 4px 20px rgba(14, 165, 233, 0.25)' : 'none',
+            }}
+          >
+            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: selectedCategory === '' ? 'white' : 'primary.main' }} />
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="body2" sx={{ fontWeight: 700, color: selectedCategory === '' ? 'white' : 'text.primary' }}>All Categories</Typography>
+            </Box>
+            {selectedCategory === '' && <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: 'white' }} />}
+          </Paper>
+          {categories.map(cat => (
+            <CategoryChip key={cat.id} cat={cat} selected={selectedCategory === cat.slug} onClick={() => onCategoryChange(cat.slug)} />
+          ))}
+        </Stack>
+      </Box>
+      <Box>
+        <Stack direction="row" sx={{ alignItems: 'center', gap: 1, mb: 2 }}>
+          <LabelImportantIcon sx={{ fontSize: 18, color: 'secondary.main' }} />
+          <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Popular Tags</Typography>
+        </Stack>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+          {tags.map(tag => (
+            <TagChip key={tag.id} tag={tag} selected={selectedTags.includes(tag.slug)} onClick={() => onTagToggle(tag.slug)} />
+          ))}
+        </Box>
+      </Box>
+    </Stack>
+  );
+}
+
 export default function BlogsPage() {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
@@ -194,62 +263,28 @@ export default function BlogsPage() {
   useEffect(() => { setPage(1); }, [debouncedSearch, category, selectedTags, sort]);
 
   const { data, isLoading } = useQuery({ queryKey: ['blogs', debouncedSearch, category, selectedTags, sort, page], queryFn: () => blogService.getBlogs({ search: debouncedSearch, category, tags: selectedTags, sort, page }) });
+  const { data: apiCategories = [] } = useQuery({ queryKey: ['categories'], queryFn: () => categoryService.getCategories(), staleTime: 5 * 60 * 1000 });
+
+  const displayCategories = apiCategories.length > 0 ? apiCategories : fallbackCategories;
 
   const toggleTag = (slug: string) => setSelectedTags(prev => prev.includes(slug) ? prev.filter(t => t !== slug) : [...prev, slug]);
   const clearFilters = () => { setSearch(''); setCategory(''); setSelectedTags([]); setSort('latest'); setPage(1); };
 
-  const FiltersContent = () => (
-    <Stack spacing={4}>
-      <Box>
-        <Stack direction="row" sx={{ alignItems: 'center', gap: 1, mb: 2 }}>
-          <AutoAwesomeIcon sx={{ fontSize: 18, color: 'primary.main' }} />
-          <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Categories</Typography>
-        </Stack>
-        <Stack spacing={1}>
-          <Paper
-            elevation={0}
-            onClick={() => setCategory('')}
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1.5,
-              p: 1.5,
-              borderRadius: 3,
-              cursor: 'pointer',
-              border: '2px solid',
-              borderColor: category === '' ? 'primary.main' : 'divider',
-              background: category === '' ? 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)' : 'transparent',
-              transition: 'all 0.3s ease',
-              transform: category === '' ? 'scale(1.02)' : 'scale(1)',
-              boxShadow: category === '' ? '0 4px 20px rgba(14, 165, 233, 0.25)' : 'none',
-            }}
-          >
-            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: category === '' ? 'white' : 'primary.main' }} />
-            <Box sx={{ flex: 1 }}>
-              <Typography variant="body2" sx={{ fontWeight: 700, color: category === '' ? 'white' : 'text.primary' }}>All Categories</Typography>
-            </Box>
-            {category === '' && (
-              <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: 'white' }} />
-            )}
-          </Paper>
-          {categories.map(cat => (
-            <CategoryChip key={cat.id} cat={cat} selected={category === cat.slug} onClick={() => setCategory(cat.slug)} />
-          ))}
-        </Stack>
-      </Box>
-      <Box>
-        <Stack direction="row" sx={{ alignItems: 'center', gap: 1, mb: 2 }}>
-          <LabelImportantIcon sx={{ fontSize: 18, color: 'secondary.main' }} />
-          <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Popular Tags</Typography>
-        </Stack>
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-          {tags.map(tag => (
-            <TagChip key={tag.id} tag={tag} selected={selectedTags.includes(tag.slug)} onClick={() => toggleTag(tag.slug)} />
-          ))}
-        </Box>
-      </Box>
-    </Stack>
+  const skeletons = Array.from({ length: 9 }, (_, i) => (
+    <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={`skeleton-${i}`}><BlogCardSkeleton /></Grid>
+  ));
+  const emptyState = (
+    <Grid size={12}>
+      <Paper elevation={0} sx={{ p: 8, textAlign: 'center', border: '1px solid', borderColor: 'divider' }}>
+        <Typography variant="h5" sx={{ fontWeight: 700 }} gutterBottom>No articles found</Typography>
+        <Button variant="contained" onClick={clearFilters}>Clear Filters</Button>
+      </Paper>
+    </Grid>
   );
+  let blogGridContent;
+  if (isLoading) { blogGridContent = skeletons; }
+  else if (data?.data.length) { blogGridContent = data.data.map(blog => <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={blog.id}><BlogCard blog={blog} /></Grid>); }
+  else { blogGridContent = emptyState; }
 
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -265,18 +300,20 @@ export default function BlogsPage() {
         <Container maxWidth="xl">
           <Grid container spacing={4}>
             <Grid size={{ xs: 12, md: 3 }} sx={{ display: { xs: 'none', md: 'block' } }}>
-              <Paper elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider', borderRadius: 3, position: 'sticky', top: 88 }}><FiltersContent /></Paper>
+              <Paper elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider', borderRadius: 3, position: 'sticky', top: 88 }}>
+                <FiltersContent categories={displayCategories} selectedCategory={category} onCategoryChange={setCategory} selectedTags={selectedTags} onTagToggle={toggleTag} />
+              </Paper>
             </Grid>
             <Grid size={{ xs: 12, md: 9 }}>
               <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2, mb: 3 }}>
                 <Typography variant="body2" color="text.secondary">Showing <strong>{data?.data.length ?? 0}</strong> of <strong>{data?.total ?? 0}</strong> articles</Typography>
                 <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
-                  <FormControl size="small" sx={{ minWidth: 160 }}><InputLabel>Sort By</InputLabel><Select value={sort} label="Sort By" onChange={e => setSort(e.target.value as SortOption)}>{SORT_OPTIONS.map(opt => <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>)}</Select></FormControl>
+                  <FormControl size="small" sx={{ minWidth: 160 }}><InputLabel>Sort By</InputLabel><Select value={sort} label="Sort By" onChange={e => setSort(e.target.value)}>{SORT_OPTIONS.map(opt => <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>)}</Select></FormControl>
                   <Button variant="outlined" startIcon={<TuneIcon />} onClick={() => setDrawerOpen(true)} sx={{ display: { xs: 'flex', md: 'none' } }}>Filters</Button>
                 </Stack>
               </Stack>
               <Grid container spacing={3}>
-                {isLoading ? Array.from({ length: 9 }).map((_, i) => <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={i}><BlogCardSkeleton /></Grid>) : data?.data.length === 0 ? <Grid size={12}><Paper elevation={0} sx={{ p: 8, textAlign: 'center', border: '1px solid', borderColor: 'divider' }}><Typography variant="h5" sx={{ fontWeight: 700 }} gutterBottom>No articles found</Typography><Button variant="contained" onClick={clearFilters}>Clear Filters</Button></Paper></Grid> : data?.data.map(blog => <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={blog.id}><BlogCard blog={blog} /></Grid>)}
+                {blogGridContent}
               </Grid>
               {data && data.totalPages > 1 && <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}><Pagination count={data.totalPages} page={page} onChange={(_, p) => { setPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }} color="primary" size="large" shape="rounded" /></Box>}
             </Grid>
@@ -303,7 +340,7 @@ export default function BlogsPage() {
               <CloseIcon />
             </IconButton>
           </Stack>
-          <FiltersContent />
+          <FiltersContent categories={displayCategories} selectedCategory={category} onCategoryChange={setCategory} selectedTags={selectedTags} onTagToggle={toggleTag} />
         </Box>
       </Drawer>
       <Footer />

@@ -11,8 +11,6 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import ShareIcon from '@mui/icons-material/Share';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import TwitterIcon from '@mui/icons-material/Twitter';
-import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import { useQuery } from '@tanstack/react-query';
 import Navbar from '@/src/components/layout/Navbar';
 import BlogImage from '@/src/components/common/BlogImage';
@@ -90,7 +88,7 @@ export default function BlogDetailPage() {
           <Grid container spacing={5}>
             <Grid size={{ xs: 12, lg: 8 }}>
               <Box sx={{ width: '100%', borderRadius: 3, mb: 5, height: 480, overflow: 'hidden', boxShadow: 4 }}>
-                <BlogImage src={blog.featuredImage} alt={blog.title} />
+                <BlogImage src={blog.featuredImage} alt={blog.title} priority />
               </Box>
               <BlogContentRenderer content={blog.content} />
               <Divider sx={{ my: 5 }} />

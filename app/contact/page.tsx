@@ -17,6 +17,7 @@ import Footer from '@/src/components/layout/Footer';
 import { useAppDispatch } from '@/src/redux/hooks';
 import { showSnackbar } from '@/src/redux/slices/uiSlice';
 import { SITE_NAME } from '@/src/constants';
+import apiClient from '@/src/services/apiClient';
 
 const SUBJECTS = [
   'General Enquiry',
@@ -82,10 +83,20 @@ export default function ContactPage() {
     const e2 = validate();
     if (Object.keys(e2).length > 0) { setErrors(e2); return; }
     setLoading(true);
-    await new Promise(r => setTimeout(r, 900));
-    setLoading(false);
-    setSubmitted(true);
-    dispatch(showSnackbar({ message: 'Message sent! We\'ll get back to you soon.', severity: 'success' }));
+    try {
+      await apiClient.post('/api/v1/contacts', {
+        name: form.name.trim(),
+        email: form.email.trim(),
+        subject: form.subject,
+        message: form.message.trim(),
+      });
+      setSubmitted(true);
+      dispatch(showSnackbar({ message: 'Message sent! We\'ll get back to you soon.', severity: 'success' }));
+    } catch {
+      dispatch(showSnackbar({ message: 'Failed to send message. Please try again.', severity: 'error' }));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -234,8 +245,8 @@ export default function ContactPage() {
                   <Typography variant="h6" sx={{ fontWeight: 700, mb: 2.5 }}>Contact Info</Typography>
                   <Stack spacing={2.5}>
                     {[
-                      { label: 'General Enquiries', value: 'hello@aiinsightsblogs.com' },
-                      { label: 'Content Corrections', value: 'corrections@aiinsightsblogs.com' },
+                      { label: 'General Enquiries', value: 'aiinsightsblogs@gmail.com' },
+                      { label: 'Content Corrections', value: 'aiinsightsblogs@gmail.com' },
                       { label: 'Response Time', value: '1–2 business days' },
                     ].map(({ label, value }) => (
                       <Box key={label}>

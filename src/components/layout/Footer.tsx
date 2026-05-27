@@ -1,12 +1,16 @@
 'use client';
 
-import { Box, Container, Grid, Typography, Stack, IconButton, Divider, TextField, Button, Link as MuiLink } from '@mui/material';
+import { useState } from 'react';
+import { Box, Container, Grid, Typography, Stack, IconButton, Divider, TextField, Button, Link as MuiLink, CircularProgress } from '@mui/material';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import Link from 'next/link';
 import { SITE_NAME, SITE_DESCRIPTION } from '@/src/constants';
+import { useAppDispatch } from '@/src/redux/hooks';
+import { showSnackbar } from '@/src/redux/slices/uiSlice';
+import apiClient from '@/src/services/apiClient';
 
 const footerLinks: Record<string, { label: string; href: string }[]> = {
   Platform: [{ label: 'Home', href: '/' }, { label: 'Blogs', href: '/blogs' }, { label: 'About Us', href: '/about' }, { label: 'Contact', href: '/contact' }],
@@ -15,6 +19,34 @@ const footerLinks: Record<string, { label: string; href: string }[]> = {
 };
 
 export default function Footer() {
+  const dispatch = useAppDispatch();
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
+
+  const handleSubscribe = async () => {
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      dispatch(showSnackbar({ message: 'Please enter a valid email address.', severity: 'error' }));
+      return;
+    }
+    setLoading(true);
+    try {
+      await apiClient.post('/api/v1/subscribers', { email: email.trim() });
+      setDone(true);
+      setEmail('');
+      dispatch(showSnackbar({ message: 'Subscribed! Welcome to the AI Insights Blogs community.', severity: 'success' }));
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      if (msg?.toLowerCase().includes('already')) {
+        dispatch(showSnackbar({ message: 'This email is already subscribed.', severity: 'info' }));
+      } else {
+        dispatch(showSnackbar({ message: 'Subscription failed. Please try again.', severity: 'error' }));
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Box component="footer" sx={{ bgcolor: 'background.paper', borderTop: 1, borderColor: 'divider', pt: 8, pb: 4, mt: 'auto' }}>
       <Container maxWidth="xl">
@@ -44,10 +76,16 @@ export default function Footer() {
           <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
             <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 2, textTransform: 'uppercase', letterSpacing: 1, fontSize: '0.7rem', color: 'text.secondary' }}>Newsletter</Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>Stay updated with the latest AI news and insights.</Typography>
-            <Stack direction="row" spacing={1}>
-              <TextField size="small" placeholder="Your email" fullWidth sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }} />
-              <Button variant="contained" size="small" sx={{ whiteSpace: 'nowrap', px: 2 }}>Subscribe</Button>
-            </Stack>
+            {done ? (
+              <Typography variant="body2" sx={{ color: 'success.main', fontWeight: 600 }}>✓ You're subscribed!</Typography>
+            ) : (
+              <Stack direction="row" spacing={1}>
+                <TextField size="small" placeholder="Your email" fullWidth value={email ?? ''} onChange={e => setEmail(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSubscribe()} type="email" sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }} />
+                <Button variant="contained" size="small" disabled={loading} onClick={handleSubscribe} sx={{ whiteSpace: 'nowrap', px: 2, minWidth: 90 }}>
+                  {loading ? <CircularProgress size={14} color="inherit" /> : 'Subscribe'}
+                </Button>
+              </Stack>
+            )}
           </Grid>
         </Grid>
         <Divider sx={{ my: 4 }} />

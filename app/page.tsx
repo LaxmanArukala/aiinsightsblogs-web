@@ -38,7 +38,7 @@ export default function HomePage() {
         <FeaturedBlogs blogs={featured ?? []} isLoading={featuredLoading} />
         <StatsSection />
         <LatestArticles blogs={all?.data ?? []} isLoading={allLoading} />
-        <TestimonialsSection testimonials={testimonials} />
+        {testimonials.length > 0 && <TestimonialsSection testimonials={testimonials} />}
         <NewsletterSection />
       </Box>
       <Footer />

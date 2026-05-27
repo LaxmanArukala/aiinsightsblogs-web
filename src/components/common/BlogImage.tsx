@@ -8,6 +8,7 @@ interface BlogImageProps {
   src?: string | null;
   alt: string;
   sx?: SxProps<Theme>;
+  priority?: boolean;
 }
 
 function Fallback() {
@@ -67,7 +68,7 @@ function Fallback() {
   );
 }
 
-export default function BlogImage({ src, alt, sx }: BlogImageProps) {
+export default function BlogImage({ src, alt, sx, priority = false }: Readonly<BlogImageProps>) {
   const [errored, setErrored] = useState(false);
 
   if (!src || errored) {
@@ -80,6 +81,7 @@ export default function BlogImage({ src, alt, sx }: BlogImageProps) {
       src={src}
       alt={alt}
       onError={() => setErrored(true)}
+      fetchPriority={priority ? 'high' : 'auto'}
       sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', ...sx }}
     />
   );

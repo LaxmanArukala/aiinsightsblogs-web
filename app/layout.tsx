@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import Script from 'next/script';
 import './globals.css';
 import AppProviders from '@/src/components/providers/AppProviders';
 import GlobalSnackbar from '@/src/components/common/GlobalSnackbar';
@@ -42,6 +43,21 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://images.unsplash.com" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-6SYQDMZ6L0"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">{`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-6SYQDMZ6L0');
+        `}</Script>
+      </head>
       <body className={inter.variable} suppressHydrationWarning>
         <AppProviders>
           {children}
