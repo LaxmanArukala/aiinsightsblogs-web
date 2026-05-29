@@ -10,7 +10,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import type { Comment } from '@/src/types';
-import { timeAgo, formatNumber } from '@/src/utils/formatters';
+import { timeAgo, formatDateTime, formatNumber } from '@/src/utils/formatters';
 import { useAppDispatch, useAppSelector } from '@/src/redux/hooks';
 import { toggleCommentLike, addComment, deleteComment } from '@/src/redux/slices/commentSlice';
 
@@ -18,7 +18,7 @@ interface CommentItemProps { comment: Comment; blogId: string; depth?: number; }
 
 const MAX_DEPTH = 4;
 
-export default function CommentItem({ comment, blogId, depth = 0 }: CommentItemProps) {
+export default function CommentItem({ comment, blogId, depth = 0 }: Readonly<CommentItemProps>) {
   const dispatch = useAppDispatch();
   const isLiked = useAppSelector(s => s.comment.likedComments.includes(comment.id));
   const [replyOpen, setReplyOpen] = useState(false);
@@ -43,6 +43,8 @@ export default function CommentItem({ comment, blogId, depth = 0 }: CommentItemP
           <Stack direction="row" sx={{ alignItems: 'center', gap: 1, flexWrap: 'wrap', mb: 0.5 }}>
             <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{comment.author.name}</Typography>
             <Typography variant="caption" color="text.secondary">{timeAgo(comment.createdAt)}</Typography>
+            <Typography variant="caption" color="text.disabled">·</Typography>
+            <Typography variant="caption" color="text.disabled">{formatDateTime(comment.createdAt)}</Typography>
             {comment.updatedAt && <Chip label="edited" size="small" variant="outlined" sx={{ height: 16, fontSize: '0.6rem' }} />}
           </Stack>
           {editing ? (

@@ -11,6 +11,7 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import ShareIcon from '@mui/icons-material/Share';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import { useQuery } from '@tanstack/react-query';
 import Navbar from '@/src/components/layout/Navbar';
 import BlogImage from '@/src/components/common/BlogImage';
@@ -91,6 +92,41 @@ export default function BlogDetailPage() {
                 <BlogImage src={blog.featuredImage} alt={blog.title} priority />
               </Box>
               <BlogContentRenderer content={blog.content} />
+              {blog.tags && blog.tags.length > 0 && (
+                <Box sx={{ mt: 5 }}>
+                  <Stack direction="row" sx={{ alignItems: 'center', gap: 1, mb: 2 }}>
+                    <LocalOfferIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: '0.75rem' }}>Tags</Typography>
+                  </Stack>
+                  <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 1 }}>
+                    {blog.tags.map(tag => (
+                      <Chip
+                        key={tag.id}
+                        label={tag.name}
+                        component={Link}
+                        href={`/blogs?tag=${tag.slug}`}
+                        clickable
+                        variant="outlined"
+                        size="small"
+                        sx={{
+                          borderRadius: 2,
+                          fontWeight: 600,
+                          fontSize: '0.8rem',
+                          px: 0.5,
+                          borderColor: 'divider',
+                          color: 'text.secondary',
+                          transition: 'all 0.2s ease',
+                          '&:hover': {
+                            borderColor: 'primary.main',
+                            bgcolor: 'primary.main',
+                            color: 'white',
+                          },
+                        }}
+                      />
+                    ))}
+                  </Stack>
+                </Box>
+              )}
               <Divider sx={{ my: 5 }} />
               <ReviewsSection blogId={blog.id} />
               <Divider sx={{ my: 5 }} />

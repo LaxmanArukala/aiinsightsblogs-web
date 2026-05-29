@@ -1,11 +1,8 @@
 import axios from 'axios';
 import type { Blog, BlogFilters, PaginatedResponse, Comment, Review, ArticleDetailResponse, BlogStats } from '@/src/types';
-import type { ApiEnvelope, RawBlog, RawBlogListResponse, RawBlogDetailResponse, RawTag } from '@/src/types/api';
-import { comments, reviews } from '@/src/utils/mockData';
+import type { ApiEnvelope, RawBlog, RawBlogListResponse, RawBlogDetailResponse, RawTag, RawComment, RawCommentListResponse, RawReview, RawReviewListResponse } from '@/src/types/api';
 import { BLOGS_PER_PAGE } from '@/src/constants';
 import apiClient from './apiClient';
-
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 function mapBlog(raw: RawBlog): Blog {
   return {
@@ -45,6 +42,31 @@ function mapPaginatedBlogs(raw: RawBlogListResponse): PaginatedResponse<Blog> {
     page:       raw.meta.page,
     pageSize:   raw.meta.limit,
     totalPages: raw.meta.total_pages,
+  };
+}
+
+function mapComment(raw: RawComment): Comment {
+  return {
+    id:        raw.comment_id,
+    blogId:    raw.blog_id,
+    parentId:  null,
+    author:    { name: raw.name, avatar: '' },
+    content:   raw.comment_text,
+    likes:     0,
+    createdAt: raw.created_at,
+    replies:   [],
+  };
+}
+
+function mapReview(raw: RawReview): Review {
+  return {
+    id:        raw.review_id,
+    blogId:    raw.blog_id,
+    author:    { name: raw.name, email: raw.email, avatar: '' },
+    rating:    raw.rating,
+    content:   raw.review_text,
+    createdAt: raw.created_at,
+    helpful:   0,
   };
 }
 
@@ -96,12 +118,42 @@ export const blogService = {
   },
 
   async getComments(blogId: string): Promise<Comment[]> {
-    await delay(200);
-    return comments.filter(c => c.blogId === blogId && c.parentId === null);
+    try {
+      const { data: envelope } = await apiClient.get<ApiEnvelope<RawCommentListResponse>>(
+        `/api/v1/blogs/${blogId}/comments`,
+        { params: { status: 'approved' } },
+      );
+      return envelope.data.data.map(mapComment);
+    } catch {
+      return [];
+    }
+  },
+
+  async postComment(blogId: string, payload: { name: string; comment_text: string }): Promise<Comment> {
+    const { data: envelope } = await apiClient.post<ApiEnvelope<RawComment>>(
+      `/api/v1/blogs/${blogId}/comments`,
+      { ...payload, status: 'pending' },
+    );
+    return mapComment(envelope.data);
   },
 
   async getReviews(blogId: string): Promise<Review[]> {
-    await delay(200);
-    return reviews.filter(r => r.blogId === blogId);
+    try {
+      const { data: envelope } = await apiClient.get<ApiEnvelope<RawReviewListResponse>>(
+        `/api/v1/blogs/${blogId}/reviews`,
+        { params: { status: 'approved' } },
+      );
+      return envelope.data.data.map(mapReview);
+    } catch {
+      return [];
+    }
+  },
+
+  async postReview(blogId: string, payload: { name: string; email: string; rating: number; review_text: string }): Promise<Review> {
+    const { data: envelope } = await apiClient.post<ApiEnvelope<RawReview>>(
+      `/api/v1/blogs/${blogId}/reviews`,
+      { ...payload, status: 'pending' },
+    );
+    return mapReview(envelope.data);
   },
 };

@@ -1,37 +1,72 @@
 'use client';
 
-import { useEffect } from 'react';
-import { Box, Typography, Stack, Divider, Rating, LinearProgress, Button, Paper, CircularProgress, Grid } from '@mui/material';
+import { Box, Typography, Stack, Divider, Rating, LinearProgress, Button, Paper, CircularProgress, Grid, TextField } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm, Controller } from 'react-hook-form';
-import { TextField } from '@mui/material';
-import { useAppDispatch, useAppSelector } from '@/src/redux/hooks';
-import { setReviews, addReview } from '@/src/redux/slices/reviewSlice';
+import { useAppDispatch } from '@/src/redux/hooks';
+import { showSnackbar } from '@/src/redux/slices/uiSlice';
 import { blogService } from '@/src/services/blogService';
 import ReviewCard from './ReviewCard';
-import type { ReviewFormData, Review } from '@/src/types';
+import type { ReviewFormData } from '@/src/types';
 
-interface ReviewsSectionProps { blogId: string; }
+interface ReviewsSectionProps { readonly blogId: string; }
 
-export default function ReviewsSection({ blogId }: ReviewsSectionProps) {
+export default function ReviewsSection({ blogId }: Readonly<ReviewsSectionProps>) {
   const dispatch = useAppDispatch();
-  const reviews = useAppSelector(s => s.review.reviewsByBlog[blogId] ?? []);
-  const { data, isLoading } = useQuery({ queryKey: ['reviews', blogId], queryFn: () => blogService.getReviews(blogId) });
-  useEffect(() => { if (data) dispatch(setReviews({ blogId, reviews: data })); }, [data, blogId, dispatch]);
-  const { register, control, handleSubmit, reset, formState: { errors } } = useForm<ReviewFormData>({ defaultValues: { name: '', email: '', rating: 5, content: '' } });
+  const queryClient = useQueryClient();
+
+  const { data: reviews = [], isLoading } = useQuery({
+    queryKey: ['reviews', blogId],
+    queryFn: () => blogService.getReviews(blogId),
+  });
+
+  const { register, control, handleSubmit, reset, formState: { errors } } = useForm<ReviewFormData>({
+    defaultValues: { name: '', email: '', rating: 5, content: '' },
+  });
+
+  const mutation = useMutation({
+    mutationFn: (payload: { name: string; email: string; rating: number; review_text: string }) =>
+      blogService.postReview(blogId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reviews', blogId] });
+      dispatch(showSnackbar({ message: 'Review submitted successfully!', severity: 'success' }));
+      reset();
+    },
+    onError: () => {
+      dispatch(showSnackbar({ message: 'Failed to submit review. Please try again.', severity: 'error' }));
+    },
+  });
 
   const onSubmit = (formData: ReviewFormData) => {
-    const review: Review = { id: `r-${Date.now()}`, blogId, author: { name: formData.name, email: formData.email, avatar: `https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100` }, rating: formData.rating, content: formData.content, createdAt: new Date().toISOString(), helpful: 0 };
-    dispatch(addReview({ blogId, review })); reset();
+    mutation.mutate({ name: formData.name, email: formData.email, rating: formData.rating, review_text: formData.content });
   };
 
   const avgRating = reviews.length > 0 ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0;
-  const ratingDist = [5, 4, 3, 2, 1].map(star => ({ star, count: reviews.filter(r => r.rating === star).length, pct: reviews.length > 0 ? (reviews.filter(r => r.rating === star).length / reviews.length) * 100 : 0 }));
+  const ratingDist = [5, 4, 3, 2, 1].map(star => ({
+    star,
+    count: reviews.filter(r => r.rating === star).length,
+    pct: reviews.length > 0 ? (reviews.filter(r => r.rating === star).length / reviews.length) * 100 : 0,
+  }));
+
+  const submitIcon = mutation.isPending ? <CircularProgress size={16} color="inherit" /> : undefined;
+  const submitLabel = mutation.isPending ? 'Submitting…' : 'Submit Review';
+
+  let reviewListContent;
+  if (isLoading) {
+    reviewListContent = <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}><CircularProgress size={32} /></Box>;
+  } else if (reviews.length === 0) {
+    reviewListContent = <Box sx={{ textAlign: 'center', py: 6, color: 'text.secondary' }}><StarIcon sx={{ fontSize: 48, mb: 1, opacity: 0.4 }} /><Typography>No reviews yet. Be the first to review!</Typography></Box>;
+  } else {
+    reviewListContent = <Stack divider={<Divider />}>{reviews.map(review => <ReviewCard key={review.id} review={review} />)}</Stack>;
+  }
 
   return (
     <Box sx={{ mt: 6 }}>
-      <Stack direction="row" sx={{ alignItems: 'center', gap: 1.5, mb: 4 }}><StarIcon sx={{ color: 'warning.main' }} /><Typography variant="h5" sx={{ fontWeight: 700 }}>Reviews ({reviews.length})</Typography></Stack>
+      <Stack direction="row" sx={{ alignItems: 'center', gap: 1.5, mb: 4 }}>
+        <StarIcon sx={{ color: 'warning.main' }} />
+        <Typography variant="h5" sx={{ fontWeight: 700 }}>Reviews ({reviews.length})</Typography>
+      </Stack>
       {reviews.length > 0 && (
         <Paper elevation={0} sx={{ p: 3, mb: 4, border: '1px solid', borderColor: 'divider', borderRadius: 3 }}>
           <Grid container spacing={4} sx={{ alignItems: 'center' }}>
@@ -66,11 +101,13 @@ export default function ReviewsSection({ blogId }: ReviewsSectionProps) {
               <Controller name="rating" control={control} rules={{ required: true }} render={({ field }) => <Rating value={field.value} onChange={(_, val) => field.onChange(val ?? 1)} size="large" />} />
             </Box>
             <TextField fullWidth multiline rows={4} label="Your Review *" {...register('content', { required: 'Review is required', minLength: { value: 20, message: 'At least 20 characters' } })} error={!!errors.content} helperText={errors.content?.message} placeholder="Share your honest opinion about this article..." />
-            <Button type="submit" variant="contained" sx={{ alignSelf: 'flex-start' }}>Submit Review</Button>
+            <Button type="submit" variant="contained" disabled={mutation.isPending} startIcon={submitIcon} sx={{ alignSelf: 'flex-start' }}>
+              {submitLabel}
+            </Button>
           </Stack>
         </Box>
       </Paper>
-      {isLoading ? <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}><CircularProgress size={32} /></Box> : reviews.length === 0 ? <Box sx={{ textAlign: 'center', py: 6, color: 'text.secondary' }}><StarIcon sx={{ fontSize: 48, mb: 1, opacity: 0.4 }} /><Typography>No reviews yet. Be the first to review!</Typography></Box> : <Stack divider={<Divider />}>{reviews.map(review => <ReviewCard key={review.id} review={review} />)}</Stack>}
+      {reviewListContent}
     </Box>
   );
 }

@@ -79,6 +79,36 @@ export interface RawBlogListResponse {
 
 export type RawBlogDetailResponse = RawBlog;
 
+export interface RawComment {
+  comment_id: string;
+  blog_id: string;
+  name: string;
+  comment_text: string;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface RawCommentListResponse {
+  data: RawComment[];
+  meta: RawMeta;
+}
+
+export interface RawReview {
+  review_id: string;
+  blog_id: string;
+  name: string;
+  email: string;
+  rating: number;
+  review_text: string;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface RawReviewListResponse {
+  data: RawReview[];
+  meta: RawMeta;
+}
+
 export interface RawTestimonial {
   id: string;
   author: string;

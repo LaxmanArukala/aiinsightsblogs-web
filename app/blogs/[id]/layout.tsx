@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: blog.title,
     description: blog.excerpt,
-    keywords: [blog.category.name, ...keywords, 'AI', SITE_NAME],
+    keywords: [...(blog.category ? [blog.category.name] : []), ...keywords, 'AI', SITE_NAME],
     alternates: { canonical: url },
     openGraph: {
       title: `${blog.title} | ${SITE_NAME}`,
