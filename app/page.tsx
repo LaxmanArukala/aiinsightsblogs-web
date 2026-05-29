@@ -11,6 +11,7 @@ import LatestArticles from '@/src/components/home/LatestArticles';
 import StatsSection from '@/src/components/home/StatsSection';
 import TestimonialsSection from '@/src/components/home/TestimonialsSection';
 import NewsletterSection from '@/src/components/home/NewsletterSection';
+import AboutSection from '@/src/components/home/AboutSection';
 import { blogService } from '@/src/services/blogService';
 import { testimonialService } from '@/src/services/testimonialService';
 
@@ -34,9 +35,10 @@ export default function HomePage() {
       <Navbar />
       <Box component="main" sx={{ flexGrow: 1 }}>
         <HeroSection />
+        <AboutSection />
         <TrendingTopics />
         <FeaturedBlogs blogs={featured ?? []} isLoading={featuredLoading} />
-        <StatsSection />
+        {/* <StatsSection /> */}
         <LatestArticles blogs={all?.data ?? []} isLoading={allLoading} />
         {testimonials.length > 0 && <TestimonialsSection testimonials={testimonials} />}
         <NewsletterSection />

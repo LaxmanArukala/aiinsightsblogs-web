@@ -14,10 +14,15 @@ function mapCategory(raw: RawCategoryFull): Category {
 
 export const categoryService = {
   async getCategories(): Promise<Category[]> {
-    const { data: envelope } = await apiClient.get<ApiEnvelope<RawCategoryListResponse>>(
-      '/api/v1/categories',
-      { params: { limit: 100 } },
-    );
-    return envelope.data.data.map(mapCategory);
+    try {
+      const { data: envelope } = await apiClient.get<ApiEnvelope<RawCategoryListResponse>>(
+        '/api/v1/categories',
+        { params: { limit: 100 } },
+      );
+      if (!envelope.data?.data) return [];
+      return envelope.data.data.map(mapCategory);
+    } catch {
+      return [];
+    }
   },
 };
