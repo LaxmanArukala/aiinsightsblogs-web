@@ -90,7 +90,7 @@ export default function Footer() {
         </Grid>
         <Divider sx={{ my: 4 }} />
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
-          <Typography variant="body2" color="text.secondary">© 2025 {SITE_NAME}. All rights reserved.</Typography>
+          <Typography variant="body2" color="text.secondary">© 2026 {SITE_NAME}. All rights reserved.</Typography>
           <Stack direction="row" spacing={3}>
             <MuiLink component={Link} href="/privacy-policy" underline="hover" sx={{ color: 'text.secondary', fontSize: '0.8rem', '&:hover': { color: 'primary.main' } }}>Privacy Policy</MuiLink>
             <MuiLink component={Link} href="/terms-and-conditions" underline="hover" sx={{ color: 'text.secondary', fontSize: '0.8rem', '&:hover': { color: 'primary.main' } }}>Terms & Conditions</MuiLink>
