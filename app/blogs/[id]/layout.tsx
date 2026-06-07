@@ -1,6 +1,21 @@
 import type { Metadata } from 'next';
 import { SITE_NAME, SITE_URL } from '@/src/constants';
 
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  try {
+    const base = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://api.aiinsightsblogs.com';
+    const res = await fetch(`${base}/api/v1/blogs?limit=1000`);
+    if (!res.ok) return [];
+    const json = await res.json();
+    const blogs: { id: string; slug: string }[] = json?.data?.data ?? [];
+    return blogs.map((blog) => ({ id: `${blog.id}-${blog.slug}` }));
+  } catch {
+    return [];
+  }
+}
+
 interface Props {
   params: Promise<{ id: string }>;
 }
