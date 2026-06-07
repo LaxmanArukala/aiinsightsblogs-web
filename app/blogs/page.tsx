@@ -26,7 +26,7 @@ export default function BlogsPage() {
     queryFn: () => blogService.getBlogs({ search: debouncedSearch, sort, page }),
   });
 
-  const skeletons = Array.from({ length: 9 }, (_, i) => (
+  const skeletons = Array.from({ length: 12 }, (_, i) => (
     <Grid size={{ xs: 12, sm: 6, lg: 4 }} key={`skeleton-${i}`}><BlogCardSkeleton /></Grid>
   ));
 

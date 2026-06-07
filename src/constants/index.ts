@@ -1,7 +1,7 @@
 export const SITE_NAME = 'AI Insights Blogs';
 export const SITE_DESCRIPTION = 'Your premier destination for deep-dive articles on AI Agents, Large Language Models, and Generative AI. Stay ahead with expert insights, tutorials, and analysis.';
 export const SITE_URL = 'https://aiinsightsblogs.com';
-export const BLOGS_PER_PAGE = 9;
+export const BLOGS_PER_PAGE = 12;
 
 export const SORT_OPTIONS = [
   { value: 'latest', label: 'Latest' },
