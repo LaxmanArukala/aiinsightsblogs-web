@@ -23,7 +23,7 @@ export interface RawAuthor {
 export interface RawCategory {
   id: string;
   name: string;
-  slug: string;
+  slug?: string;
   color?: string;
 }
 

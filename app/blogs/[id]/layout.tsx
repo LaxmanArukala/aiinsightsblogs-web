@@ -12,8 +12,8 @@ interface RawBlog {
   excerpt: string;
   featured_image: string;
   thumbnail: string;
-  category: { name: string; slug: string };
-  tags: { name: string }[];
+  category: { name: string; slug?: string };
+  tags: ({ name: string } | string)[];
 }
 
 async function fetchBlog(id: string): Promise<RawBlog | null> {
@@ -38,8 +38,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const url = `${SITE_URL}/blogs/${blog.id}-${blog.slug}`;
-  const image = blog.featured_image || blog.thumbnail;
-  const keywords = blog.tags?.map((t) => t.name) ?? [];
+  const DEFAULT_OG = 'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=1200&auto=format&fit=crop&q=80';
+  const image = blog.featured_image || blog.thumbnail || DEFAULT_OG;
+  const keywords = (blog.tags ?? [])
+    .map((t) => (typeof t === 'string' ? t : t.name))
+    .filter((k): k is string => Boolean(k));
 
   return {
     title: blog.title,

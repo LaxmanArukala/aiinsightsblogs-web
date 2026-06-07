@@ -16,7 +16,7 @@ function mapBlog(raw: RawBlog): Blog {
     category: raw.category ? {
       id:    raw.category.id,
       name:  raw.category.name,
-      slug:  raw.category.slug,
+      slug:  raw.category.slug ?? raw.category.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
       color: raw.category.color ?? '#0ea5e9',
     } : { id: '', name: 'General', slug: 'general', color: '#0ea5e9' },
     tags:        Array.isArray(raw.tags)
@@ -113,7 +113,7 @@ export const blogService = {
     const totalArticles = envelope.data.meta.total;
     const totalViews = blogs.reduce((sum, b) => sum + (b.views ?? 0), 0);
     const totalLikes = blogs.reduce((sum, b) => sum + (b.likes ?? 0), 0);
-    const categories = new Set(blogs.map(b => b.category.slug)).size;
+    const categories = new Set(blogs.map(b => b.category?.slug).filter(Boolean)).size;
     return { totalArticles, totalViews, totalLikes, categories };
   },
 
