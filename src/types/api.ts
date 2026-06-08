@@ -57,7 +57,7 @@ export interface RawBlog {
   thumbnail: string;
   featured_image: string;
   category: RawCategory;
-  tags: RawTag[];
+  tags: (RawTag | string)[];
   author: RawAuthor;
   published_at: string;
   read_time: number;

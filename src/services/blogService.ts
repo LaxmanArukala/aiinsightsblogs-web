@@ -20,7 +20,13 @@ function mapBlog(raw: RawBlog): Blog {
       color: raw.category.color ?? '#0ea5e9',
     } : { id: '', name: 'General', slug: 'general', color: '#0ea5e9' },
     tags:        Array.isArray(raw.tags)
-      ? raw.tags.filter((t): t is RawTag => typeof t === 'object' && t !== null)
+      ? raw.tags.map((t) => {
+          if (typeof t === 'string') {
+            const slug = t.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+            return { id: slug, name: t, slug };
+          }
+          return t as RawTag;
+        })
       : [],
     author:      raw.author ?? { id: '', name: 'AI Insights Blogs', avatar: '', bio: '' },
     publishedAt: raw.published_at,

@@ -106,29 +106,28 @@ export default function BlogDetailPage() {
                   </Stack>
                   <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 1 }}>
                     {blog.tags.map(tag => (
-                      <Chip
-                        key={tag.id}
-                        label={tag.name}
-                        component={Link}
-                        href={`/blogs?tag=${tag.slug}`}
-                        clickable
-                        variant="outlined"
-                        size="small"
-                        sx={{
-                          borderRadius: 2,
-                          fontWeight: 600,
-                          fontSize: '0.8rem',
-                          px: 0.5,
-                          borderColor: 'divider',
-                          color: 'text.secondary',
-                          transition: 'all 0.2s ease',
-                          '&:hover': {
-                            borderColor: 'primary.main',
-                            bgcolor: 'primary.main',
-                            color: 'white',
-                          },
-                        }}
-                      />
+                      <Link key={tag.id} href={`/blogs?tag=${tag.slug}`} style={{ textDecoration: 'none' }}>
+                        <Chip
+                          label={tag.name}
+                          clickable
+                          variant="outlined"
+                          size="small"
+                          sx={{
+                            borderRadius: 2,
+                            fontWeight: 600,
+                            fontSize: '0.8rem',
+                            px: 0.5,
+                            borderColor: 'divider',
+                            color: 'text.secondary',
+                            transition: 'all 0.2s ease',
+                            '&:hover': {
+                              borderColor: 'primary.main',
+                              bgcolor: 'primary.main',
+                              color: 'white',
+                            },
+                          }}
+                        />
+                      </Link>
                     ))}
                   </Stack>
                 </Box>

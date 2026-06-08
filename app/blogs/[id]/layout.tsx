@@ -3,17 +3,33 @@ import { SITE_NAME, SITE_URL } from '@/src/constants';
 
 export const dynamicParams = true;
 
-export async function generateStaticParams() {
+async function fetchAllBlogParams(): Promise<{ id: string; slug: string }[]> {
+  const base = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://api.aiinsightsblogs.com';
   try {
-    const base = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://api.aiinsightsblogs.com';
-    const res = await fetch(`${base}/api/v1/blogs?limit=1000`);
-    if (!res.ok) return [];
-    const json = await res.json();
-    const blogs: { id: string; slug: string }[] = json?.data?.data ?? [];
-    return blogs.map((blog) => ({ id: `${blog.id}-${blog.slug}` }));
+    const first = await fetch(`${base}/api/v1/blogs?limit=100&page=1`);
+    if (!first.ok) return [];
+    const firstJson = await first.json();
+    const totalPages: number = firstJson?.data?.meta?.total_pages ?? 1;
+    const firstBlogs: { id: string; slug: string }[] = firstJson?.data?.data ?? [];
+
+    const rest = await Promise.all(
+      Array.from({ length: totalPages - 1 }, (_, i) =>
+        fetch(`${base}/api/v1/blogs?limit=100&page=${i + 2}`)
+          .then(r => r.json())
+          .then(j => (j?.data?.data ?? []) as { id: string; slug: string }[])
+          .catch(() => [] as { id: string; slug: string }[]),
+      ),
+    );
+
+    return [...firstBlogs, ...rest.flat()];
   } catch {
     return [];
   }
+}
+
+export async function generateStaticParams() {
+  const blogs = await fetchAllBlogParams();
+  return blogs.map((blog) => ({ id: `${blog.id}-${blog.slug}` }));
 }
 
 interface Props {
