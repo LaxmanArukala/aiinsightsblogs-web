@@ -1,6 +1,8 @@
 import type { MetadataRoute } from 'next';
 import { SITE_URL } from '@/src/constants';
 
+export const revalidate = 3600;
+
 interface RawBlog {
   id: string;
   slug: string;
