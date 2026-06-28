@@ -100,9 +100,11 @@ export default function BlogDetailPage() {
         <Container maxWidth="xl">
           <Grid container spacing={5}>
             <Grid size={{ xs: 12, lg: 9 }}>
-              <Box sx={{ width: '100%', borderRadius: 3, mb: 5, height: 480, overflow: 'hidden', boxShadow: 4 }}>
-                <BlogImage src={blog.featuredImage} alt={blog.title} priority />
-              </Box>
+              {blog.featuredImage && (
+                <Box sx={{ width: '100%', borderRadius: 3, mb: 5, height: 480, overflow: 'hidden', boxShadow: 4 }}>
+                  <BlogImage src={blog.featuredImage} alt={blog.title} priority />
+                </Box>
+              )}
               <BlogContentRenderer content={blog.content} />
               {blog.tags && blog.tags.length > 0 && (
                 <Box sx={{ mt: 5 }}>
