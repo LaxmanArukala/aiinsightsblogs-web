@@ -2,7 +2,13 @@ import axios from 'axios';
 import type { Blog, BlogFilters, PaginatedResponse, Comment, Review, ArticleDetailResponse, BlogStats } from '@/src/types';
 import type { ApiEnvelope, RawBlog, RawBlogListResponse, RawBlogDetailResponse, RawTag, RawComment, RawCommentListResponse, RawReview, RawReviewListResponse, RawViewsData, RawLikesData, RawBookmarksData, RawSharesData } from '@/src/types/api';
 import { BLOGS_PER_PAGE } from '@/src/constants';
+import { getVisitorId } from '@/src/utils/visitorId';
 import apiClient from './apiClient';
+
+function analyticsHeaders() {
+  const id = getVisitorId();
+  return id ? { 'x-visitor-id': id } : {};
+}
 
 function mapBlog(raw: RawBlog): Blog {
   return {
@@ -140,37 +146,37 @@ export const blogService = {
   },
 
   async trackView(blogId: string): Promise<RawViewsData> {
-    const { data: envelope } = await apiClient.post<ApiEnvelope<RawViewsData>>(`/api/v1/blogs/${blogId}/views`);
+    const { data: envelope } = await apiClient.post<ApiEnvelope<RawViewsData>>(`/api/v1/blogs/${blogId}/views`, {}, { headers: analyticsHeaders() });
     return envelope.data;
   },
 
   async getLikes(blogId: string): Promise<RawLikesData> {
-    const { data: envelope } = await apiClient.get<ApiEnvelope<RawLikesData>>(`/api/v1/blogs/${blogId}/likes`);
+    const { data: envelope } = await apiClient.get<ApiEnvelope<RawLikesData>>(`/api/v1/blogs/${blogId}/likes`, { headers: analyticsHeaders() });
     return envelope.data;
   },
 
   async toggleLike(blogId: string): Promise<RawLikesData> {
-    const { data: envelope } = await apiClient.post<ApiEnvelope<RawLikesData>>(`/api/v1/blogs/${blogId}/likes`);
+    const { data: envelope } = await apiClient.post<ApiEnvelope<RawLikesData>>(`/api/v1/blogs/${blogId}/likes`, {}, { headers: analyticsHeaders() });
     return envelope.data;
   },
 
   async getBookmarks(blogId: string): Promise<RawBookmarksData> {
-    const { data: envelope } = await apiClient.get<ApiEnvelope<RawBookmarksData>>(`/api/v1/blogs/${blogId}/bookmarks`);
+    const { data: envelope } = await apiClient.get<ApiEnvelope<RawBookmarksData>>(`/api/v1/blogs/${blogId}/bookmarks`, { headers: analyticsHeaders() });
     return envelope.data;
   },
 
   async toggleBookmark(blogId: string): Promise<RawBookmarksData> {
-    const { data: envelope } = await apiClient.post<ApiEnvelope<RawBookmarksData>>(`/api/v1/blogs/${blogId}/bookmarks`);
+    const { data: envelope } = await apiClient.post<ApiEnvelope<RawBookmarksData>>(`/api/v1/blogs/${blogId}/bookmarks`, {}, { headers: analyticsHeaders() });
     return envelope.data;
   },
 
   async trackShare(blogId: string): Promise<RawSharesData> {
-    const { data: envelope } = await apiClient.post<ApiEnvelope<RawSharesData>>(`/api/v1/blogs/${blogId}/shares`);
+    const { data: envelope } = await apiClient.post<ApiEnvelope<RawSharesData>>(`/api/v1/blogs/${blogId}/shares`, {}, { headers: analyticsHeaders() });
     return envelope.data;
   },
 
   async getShares(blogId: string): Promise<RawSharesData> {
-    const { data: envelope } = await apiClient.get<ApiEnvelope<RawSharesData>>(`/api/v1/blogs/${blogId}/shares`);
+    const { data: envelope } = await apiClient.get<ApiEnvelope<RawSharesData>>(`/api/v1/blogs/${blogId}/shares`, { headers: analyticsHeaders() });
     return envelope.data;
   },
 
