@@ -1,6 +1,6 @@
 import axios from 'axios';
 import type { Blog, BlogFilters, PaginatedResponse, Comment, Review, ArticleDetailResponse, BlogStats } from '@/src/types';
-import type { ApiEnvelope, RawBlog, RawBlogListResponse, RawBlogDetailResponse, RawTag, RawComment, RawCommentListResponse, RawReview, RawReviewListResponse } from '@/src/types/api';
+import type { ApiEnvelope, RawBlog, RawBlogListResponse, RawBlogDetailResponse, RawTag, RawComment, RawCommentListResponse, RawReview, RawReviewListResponse, RawViewsData, RawLikesData, RawBookmarksData, RawSharesData } from '@/src/types/api';
 import { BLOGS_PER_PAGE } from '@/src/constants';
 import apiClient from './apiClient';
 
@@ -137,6 +137,41 @@ export const blogService = {
     const totalLikes = blogs.reduce((sum, b) => sum + (b.likes ?? 0), 0);
     const categories = new Set(blogs.map(b => b.category?.slug).filter(Boolean)).size;
     return { totalArticles, totalViews, totalLikes, categories };
+  },
+
+  async trackView(blogId: string): Promise<RawViewsData> {
+    const { data: envelope } = await apiClient.post<ApiEnvelope<RawViewsData>>(`/api/v1/blogs/${blogId}/views`);
+    return envelope.data;
+  },
+
+  async getLikes(blogId: string): Promise<RawLikesData> {
+    const { data: envelope } = await apiClient.get<ApiEnvelope<RawLikesData>>(`/api/v1/blogs/${blogId}/likes`);
+    return envelope.data;
+  },
+
+  async toggleLike(blogId: string): Promise<RawLikesData> {
+    const { data: envelope } = await apiClient.post<ApiEnvelope<RawLikesData>>(`/api/v1/blogs/${blogId}/likes`);
+    return envelope.data;
+  },
+
+  async getBookmarks(blogId: string): Promise<RawBookmarksData> {
+    const { data: envelope } = await apiClient.get<ApiEnvelope<RawBookmarksData>>(`/api/v1/blogs/${blogId}/bookmarks`);
+    return envelope.data;
+  },
+
+  async toggleBookmark(blogId: string): Promise<RawBookmarksData> {
+    const { data: envelope } = await apiClient.post<ApiEnvelope<RawBookmarksData>>(`/api/v1/blogs/${blogId}/bookmarks`);
+    return envelope.data;
+  },
+
+  async trackShare(blogId: string): Promise<RawSharesData> {
+    const { data: envelope } = await apiClient.post<ApiEnvelope<RawSharesData>>(`/api/v1/blogs/${blogId}/shares`);
+    return envelope.data;
+  },
+
+  async getShares(blogId: string): Promise<RawSharesData> {
+    const { data: envelope } = await apiClient.get<ApiEnvelope<RawSharesData>>(`/api/v1/blogs/${blogId}/shares`);
+    return envelope.data;
   },
 
   async getComments(blogId: string): Promise<Comment[]> {

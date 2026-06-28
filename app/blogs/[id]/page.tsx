@@ -12,7 +12,8 @@ import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import ShareIcon from '@mui/icons-material/Share';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
-import { useQuery } from '@tanstack/react-query';
+import { useRef, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Navbar from '@/src/components/layout/Navbar';
 import BlogImage from '@/src/components/common/BlogImage';
 import Footer from '@/src/components/layout/Footer';
@@ -21,8 +22,7 @@ import CommentsSection from '@/src/components/comments/CommentsSection';
 import ReviewsSection from '@/src/components/reviews/ReviewsSection';
 import { blogService } from '@/src/services/blogService';
 import { formatDate, formatNumber, slugify } from '@/src/utils/formatters';
-import { useAppDispatch, useAppSelector } from '@/src/redux/hooks';
-import { toggleLike, toggleBookmark } from '@/src/redux/slices/blogSlice';
+import { useAppDispatch } from '@/src/redux/hooks';
 import { showSnackbar } from '@/src/redux/slices/uiSlice';
 
 const UUID_LENGTH = 36;
@@ -31,8 +31,8 @@ export default function BlogDetailPage() {
   const { id: param } = useParams<{ id: string }>();
   const id = param.substring(0, UUID_LENGTH);
   const dispatch = useAppDispatch();
-  const likedBlogs = useAppSelector(s => s.blog.likedBlogs);
-  const bookmarkedBlogs = useAppSelector(s => s.blog.bookmarkedBlogs);
+  const queryClient = useQueryClient();
+  const viewTracked = useRef(false);
 
   const { data, isLoading } = useQuery({ queryKey: ['blog', id], queryFn: () => blogService.getBlogById(id) });
   const blog = data?.blog;
@@ -50,11 +50,48 @@ export default function BlogDetailPage() {
     enabled: !!blog?.category?.id,
   });
 
-  const isLiked = blog ? likedBlogs.includes(blog.id) : false;
-  const isBookmarked = blog ? bookmarkedBlogs.includes(blog.id) : false;
+  const { data: likesData } = useQuery({
+    queryKey: ['blog-likes', id],
+    queryFn: () => blogService.getLikes(id),
+    enabled: !!blog,
+  });
+  const { data: bookmarksData } = useQuery({
+    queryKey: ['blog-bookmarks', id],
+    queryFn: () => blogService.getBookmarks(id),
+    enabled: !!blog,
+  });
+  const { data: sharesData } = useQuery({
+    queryKey: ['blog-shares', id],
+    queryFn: () => blogService.getShares(id),
+    enabled: !!blog,
+  });
+
+  const likeMutation = useMutation({
+    mutationFn: () => blogService.toggleLike(id),
+    onSuccess: (data) => queryClient.setQueryData(['blog-likes', id], data),
+  });
+  const bookmarkMutation = useMutation({
+    mutationFn: () => blogService.toggleBookmark(id),
+    onSuccess: (data) => queryClient.setQueryData(['blog-bookmarks', id], data),
+  });
+  const shareMutation = useMutation({
+    mutationFn: () => blogService.trackShare(id),
+    onSuccess: (data) => queryClient.setQueryData(['blog-shares', id], data),
+  });
+
+  useEffect(() => {
+    if (blog && !viewTracked.current) {
+      viewTracked.current = true;
+      blogService.trackView(blog.id).catch(() => {});
+    }
+  }, [blog]);
+
+  const isLiked = likesData?.liked ?? false;
+  const isBookmarked = bookmarksData?.bookmarked ?? false;
 
   const handleShare = () => {
     navigator.clipboard.writeText(globalThis.location.href);
+    shareMutation.mutate();
     dispatch(showSnackbar({ message: 'Link copied to clipboard!', severity: 'success' }));
   };
 
@@ -84,13 +121,34 @@ export default function BlogDetailPage() {
           <Typography variant="h6" color="text.secondary" sx={{ lineHeight: 1.7, mb: 4 }}>{blog.excerpt}</Typography>
           <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ alignItems: { xs: 'flex-start', sm: 'center' }, justifyContent: 'space-between', gap: 2 }}>
             <Typography variant="caption" color="text.secondary">{formatDate(blog.publishedAt)}</Typography>
-            <Stack direction="row" sx={{ alignItems: 'center', gap: 2 }}>
+            <Stack direction="row" sx={{ alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
               <Stack direction="row" sx={{ alignItems: 'center', gap: 0.5 }}><AccessTimeIcon sx={{ fontSize: 16, color: 'text.secondary' }} /><Typography variant="body2" color="text.secondary">{blog.readTime} min read</Typography></Stack>
               <Stack direction="row" sx={{ alignItems: 'center', gap: 0.5 }}><VisibilityIcon sx={{ fontSize: 16, color: 'text.secondary' }} /><Typography variant="body2" color="text.secondary">{formatNumber(blog.views)} views</Typography></Stack>
-              <Stack direction="row" spacing={0.5}>
-                <Tooltip title={isLiked ? 'Unlike' : 'Like'}><IconButton size="small" onClick={() => dispatch(toggleLike(blog.id))}>{isLiked ? <FavoriteIcon sx={{ color: 'error.main' }} /> : <FavoriteBorderIcon />}</IconButton></Tooltip>
-                <Tooltip title={isBookmarked ? 'Remove bookmark' : 'Bookmark'}><IconButton size="small" onClick={() => dispatch(toggleBookmark(blog.id))}>{isBookmarked ? <BookmarkIcon sx={{ color: 'primary.main' }} /> : <BookmarkBorderIcon />}</IconButton></Tooltip>
-                <Tooltip title="Share"><IconButton size="small" onClick={handleShare}><ShareIcon /></IconButton></Tooltip>
+              <Stack direction="row" sx={{ alignItems: 'center', gap: 1.5 }}>
+                <Tooltip title={isLiked ? 'Unlike' : 'Like'}>
+                  <Stack direction="row" sx={{ alignItems: 'center', gap: 0.25 }}>
+                    <IconButton size="small" onClick={() => likeMutation.mutate()} disabled={likeMutation.isPending}>
+                      {isLiked ? <FavoriteIcon sx={{ fontSize: 18, color: 'error.main' }} /> : <FavoriteBorderIcon sx={{ fontSize: 18 }} />}
+                    </IconButton>
+                    <Typography variant="caption" color="text.secondary">{formatNumber(likesData?.likes ?? blog.likes)}</Typography>
+                  </Stack>
+                </Tooltip>
+                <Tooltip title={isBookmarked ? 'Remove bookmark' : 'Bookmark'}>
+                  <Stack direction="row" sx={{ alignItems: 'center', gap: 0.25 }}>
+                    <IconButton size="small" onClick={() => bookmarkMutation.mutate()} disabled={bookmarkMutation.isPending}>
+                      {isBookmarked ? <BookmarkIcon sx={{ fontSize: 18, color: 'primary.main' }} /> : <BookmarkBorderIcon sx={{ fontSize: 18 }} />}
+                    </IconButton>
+                    <Typography variant="caption" color="text.secondary">{formatNumber(bookmarksData?.bookmarks ?? blog.bookmarks)}</Typography>
+                  </Stack>
+                </Tooltip>
+                <Tooltip title="Share">
+                  <Stack direction="row" sx={{ alignItems: 'center', gap: 0.25 }}>
+                    <IconButton size="small" onClick={handleShare}>
+                      <ShareIcon sx={{ fontSize: 18 }} />
+                    </IconButton>
+                    <Typography variant="caption" color="text.secondary">{formatNumber(sharesData?.shares ?? 0)}</Typography>
+                  </Stack>
+                </Tooltip>
               </Stack>
             </Stack>
           </Stack>

@@ -109,6 +109,11 @@ export interface RawReviewListResponse {
   meta: RawMeta;
 }
 
+export interface RawViewsData { views: number; recorded: boolean; }
+export interface RawLikesData { liked: boolean; likes: number; }
+export interface RawBookmarksData { bookmarked: boolean; bookmarks: number; }
+export interface RawSharesData { shares: number; }
+
 export interface RawTestimonial {
   id: string;
   author: string;
