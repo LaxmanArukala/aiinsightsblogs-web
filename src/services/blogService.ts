@@ -91,6 +91,22 @@ export const blogService = {
     return mapPaginatedBlogs(envelope.data);
   },
 
+  async getRelatedBlogs(categoryId: string, excludeId: string): Promise<Blog[]> {
+    try {
+      const { data: envelope } = await apiClient.get<ApiEnvelope<RawBlogListResponse>>(
+        '/api/v1/blogs/related',
+        { params: { category_id: categoryId, limit: 6 } },
+      );
+      return envelope.data.data.map(mapBlog).filter(b => b.id !== excludeId);
+    } catch {
+      const { data: envelope } = await apiClient.get<ApiEnvelope<RawBlogListResponse>>(
+        '/api/v1/blogs',
+        { params: { category_id: categoryId, limit: 7 } },
+      );
+      return envelope.data.data.map(mapBlog).filter(b => b.id !== excludeId).slice(0, 6);
+    }
+  },
+
   async getFeaturedBlogs(): Promise<Blog[]> {
     const { data: envelope } = await apiClient.get<ApiEnvelope<RawBlogListResponse>>('/api/v1/blogs', {
       params: { featured: true, limit: 4 },

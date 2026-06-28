@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { Box, Container, Grid, Typography, Breadcrumbs, Link as MuiLink, Chip, Stack, Paper, Button, Divider, Skeleton, IconButton, Tooltip } from '@mui/material';
+import { Box, Container, Grid, Typography, Breadcrumbs, Link as MuiLink, Chip, Stack, Paper, Button, Divider, Skeleton, IconButton, Tooltip, Card, CardContent, CardActionArea } from '@mui/material';
 import Link from 'next/link';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -43,6 +43,12 @@ export default function BlogDetailPage() {
     enabled: !!blog,
   });
   const otherArticles = (otherData?.data ?? []).filter(b => b.id !== id).slice(0, 5);
+
+  const { data: relatedBlogs } = useQuery({
+    queryKey: ['related-blogs', blog?.category?.id, id],
+    queryFn: () => blogService.getRelatedBlogs(blog!.category.id, id),
+    enabled: !!blog?.category?.id,
+  });
 
   const isLiked = blog ? likedBlogs.includes(blog.id) : false;
   const isBookmarked = blog ? bookmarkedBlogs.includes(blog.id) : false;
@@ -131,6 +137,42 @@ export default function BlogDetailPage() {
                     ))}
                   </Stack>
                 </Box>
+              )}
+              {relatedBlogs && relatedBlogs.length > 0 && (
+                <>
+                  <Divider sx={{ my: 5 }} />
+                  <Box>
+                    <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+                      <Typography variant="h5" sx={{ fontWeight: 800 }}>Related Articles</Typography>
+                      <MuiLink component={Link} href={`/blogs?category=${blog.category.name}`} underline="hover" sx={{ fontSize: '0.875rem', color: 'primary.main', fontWeight: 600 }}>
+                        View all →
+                      </MuiLink>
+                    </Stack>
+                    <Grid container spacing={3}>
+                      {relatedBlogs.map(article => (
+                        <Grid size={{ xs: 12, sm: 6, md: 4 }} key={article.id}>
+                          <Card elevation={0} sx={{ height: '100%', border: '1px solid', borderColor: 'divider', borderRadius: 3, transition: 'all 0.2s', '&:hover': { boxShadow: 4, transform: 'translateY(-4px)' } }}>
+                            <CardActionArea component={Link} href={`/blogs/${article.id}-${slugify(article.title)}`} sx={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
+                              <Box sx={{ height: 160, overflow: 'hidden', flexShrink: 0 }}>
+                                <BlogImage src={article.thumbnail} alt={article.title} />
+                              </Box>
+                              <CardContent sx={{ flexGrow: 1, p: 2.5 }}>
+                                <Chip label={article.category.name} size="small" sx={{ mb: 1.5, bgcolor: article.category.color, color: 'white', fontWeight: 700, fontSize: '0.7rem' }} />
+                                <Typography variant="body2" sx={{ fontWeight: 700, lineHeight: 1.5, mb: 1, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                  {article.title}
+                                </Typography>
+                                <Stack direction="row" sx={{ alignItems: 'center', gap: 0.5 }}>
+                                  <AccessTimeIcon sx={{ fontSize: 13, color: 'text.secondary' }} />
+                                  <Typography variant="caption" color="text.secondary">{article.readTime} min read</Typography>
+                                </Stack>
+                              </CardContent>
+                            </CardActionArea>
+                          </Card>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  </Box>
+                </>
               )}
               <Divider sx={{ my: 5 }} />
               <ReviewsSection blogId={blog.id} />
