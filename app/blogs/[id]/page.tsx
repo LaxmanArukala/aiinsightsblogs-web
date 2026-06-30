@@ -21,7 +21,7 @@ import BlogContentRenderer from '@/src/components/blog/BlogContentRenderer';
 import CommentsSection from '@/src/components/comments/CommentsSection';
 import ReviewsSection from '@/src/components/reviews/ReviewsSection';
 import { blogService } from '@/src/services/blogService';
-import { formatDate, formatNumber, slugify } from '@/src/utils/formatters';
+import { formatDate, formatNumber } from '@/src/utils/formatters';
 import { useAppDispatch } from '@/src/redux/hooks';
 import { showSnackbar } from '@/src/redux/slices/uiSlice';
 
@@ -212,7 +212,7 @@ export default function BlogDetailPage() {
                       {relatedBlogs.map(article => (
                         <Grid size={{ xs: 12, sm: 6, md: 4 }} key={article.id}>
                           <Card elevation={0} sx={{ height: '100%', border: '1px solid', borderColor: 'divider', borderRadius: 3, transition: 'all 0.2s', '&:hover': { boxShadow: 4, transform: 'translateY(-4px)' } }}>
-                            <CardActionArea component={Link} href={`/blogs/${article.id}-${slugify(article.title)}`} sx={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
+                            <CardActionArea component={Link} href={`/blogs/${article.id}-${article.slug}`} sx={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
                               <Box sx={{ height: 160, overflow: 'hidden', flexShrink: 0 }}>
                                 <BlogImage src={article.thumbnail} alt={article.title} />
                               </Box>
@@ -251,7 +251,7 @@ export default function BlogDetailPage() {
                             <BlogImage src={article.thumbnail} alt={article.title} />
                           </Box>
                           <Box>
-                            <Typography variant="body2" component={Link} href={`/blogs/${article.id}-${slugify(article.title)}`} sx={{ fontWeight: 600, textDecoration: 'none', color: 'text.primary', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.4, mb: 0.5, '&:hover': { color: 'primary.main' } }}>{article.title}</Typography>
+                            <Typography variant="body2" component={Link} href={`/blogs/${article.id}-${article.slug}`} sx={{ fontWeight: 600, textDecoration: 'none', color: 'text.primary', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.4, mb: 0.5, '&:hover': { color: 'primary.main' } }}>{article.title}</Typography>
                             <Stack direction="row" sx={{ alignItems: 'center', gap: 0.5 }}>
                               <AccessTimeIcon sx={{ fontSize: 12, color: 'text.secondary' }} />
                               <Typography variant="caption" color="text.secondary">{article.readTime} min</Typography>

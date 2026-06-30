@@ -11,7 +11,7 @@ import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import Link from 'next/link';
 import type { Blog } from '@/src/types';
-import { formatDate, formatNumber, slugify } from '@/src/utils/formatters';
+import { formatDate, formatNumber } from '@/src/utils/formatters';
 import { useAppDispatch, useAppSelector } from '@/src/redux/hooks';
 import { toggleLike, toggleBookmark } from '@/src/redux/slices/blogSlice';
 
@@ -29,7 +29,7 @@ export default function BlogCard({ blog, compact = false }: BlogCardProps) {
         <Chip label={blog.category.name} size="small" sx={{ position: 'absolute', top: 12, left: 12, bgcolor: blog.category.color, color: 'white', fontWeight: 700, fontSize: '0.7rem' }} />
       </Box>
       <CardContent sx={{ flexGrow: 1, pb: 1 }}>
-        <Typography variant={compact ? 'subtitle1' : 'h6'} component={Link} href={`/blogs/${blog.id}-${slugify(blog.title)}`} sx={{ fontWeight: 700, textDecoration: 'none', color: 'text.primary', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.4, '&:hover': { color: 'primary.main' }, mb: 1 }}>{blog.title}</Typography>
+        <Typography variant={compact ? 'subtitle1' : 'h6'} component={Link} href={`/blogs/${blog.id}-${blog.slug}`} sx={{ fontWeight: 700, textDecoration: 'none', color: 'text.primary', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.4, '&:hover': { color: 'primary.main' }, mb: 1 }}>{blog.title}</Typography>
         {!compact && <Typography variant="body2" color="text.secondary" sx={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', mb: 2 }}>{blog.excerpt}</Typography>}
         <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
           <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}><AccessTimeIcon sx={{ fontSize: 14, color: 'text.secondary' }} /><Typography variant="caption" color="text.secondary">{blog.readTime} min</Typography></Stack>
@@ -38,7 +38,7 @@ export default function BlogCard({ blog, compact = false }: BlogCardProps) {
         <Typography variant="caption" color="text.secondary">{formatDate(blog.publishedAt)}</Typography>
       </CardContent>
       <CardActions sx={{ px: 2, pb: 2, pt: 0, justifyContent: 'space-between' }}>
-        <Button size="small" endIcon={<ArrowForwardIcon />} component={Link} href={`/blogs/${blog.id}-${slugify(blog.title)}`}>Read More</Button>
+        <Button size="small" endIcon={<ArrowForwardIcon />} component={Link} href={`/blogs/${blog.id}-${blog.slug}`}>Read More</Button>
         <Stack direction="row" spacing={0.5}>
           <Tooltip title={isLiked ? 'Unlike' : 'Like'}><IconButton size="small" onClick={() => dispatch(toggleLike(blog.id))}>{isLiked ? <FavoriteIcon sx={{ fontSize: 18, color: 'error.main' }} /> : <FavoriteBorderIcon sx={{ fontSize: 18 }} />}</IconButton></Tooltip>
           <Tooltip title={isBookmarked ? 'Remove Bookmark' : 'Bookmark'}><IconButton size="small" onClick={() => dispatch(toggleBookmark(blog.id))}>{isBookmarked ? <BookmarkIcon sx={{ fontSize: 18, color: 'primary.main' }} /> : <BookmarkBorderIcon sx={{ fontSize: 18 }} />}</IconButton></Tooltip>

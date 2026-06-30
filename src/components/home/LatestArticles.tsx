@@ -2,7 +2,6 @@
 
 import { Box, Container, Grid, Typography, Avatar, Chip, Stack, Button, Paper } from '@mui/material';
 import BlogImage from '@/src/components/common/BlogImage';
-import { slugify } from '@/src/utils/formatters';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import Link from 'next/link';
@@ -26,7 +25,7 @@ export default function LatestArticles({ blogs, isLoading }: LatestArticlesProps
                   <Chip label={blog.category.name} size="small" sx={{ position: 'absolute', top: 12, left: 12, bgcolor: blog.category.color, color: 'white', fontWeight: 700, fontSize: '0.7rem' }} />
                 </Box>
                 <Box sx={{ p: 2.5 }}>
-                  <Typography variant="subtitle1" component={Link} href={`/blogs/${blog.id}-${slugify(blog.title)}`} sx={{ fontWeight: 700, textDecoration: 'none', color: 'text.primary', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', mb: 1.5, '&:hover': { color: 'primary.main' } }}>{blog.title}</Typography>
+                  <Typography variant="subtitle1" component={Link} href={`/blogs/${blog.id}-${blog.slug}`} sx={{ fontWeight: 700, textDecoration: 'none', color: 'text.primary', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', mb: 1.5, '&:hover': { color: 'primary.main' } }}>{blog.title}</Typography>
                   <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
                     <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}><Avatar src={blog.author.avatar} sx={{ width: 24, height: 24 }} /><Typography variant="caption" sx={{ fontWeight: 600 }}>{blog.author.name}</Typography></Stack>
                     <Stack direction="row" sx={{ alignItems: 'center', gap: 0.5 }}><AccessTimeIcon sx={{ fontSize: 13, color: 'text.secondary' }} /><Typography variant="caption" color="text.secondary">{blog.readTime} min</Typography></Stack>
