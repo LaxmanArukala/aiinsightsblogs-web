@@ -22,7 +22,7 @@ export default function TestimonialsSection({ testimonials }: TestimonialsSectio
                 <Stack direction="row" sx={{ alignItems: 'center', gap: 2 }}>
                   <Avatar src={t.avatar} alt={t.author} sx={{ width: 44, height: 44 }} />
                   <Box>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{t.author}</Typography>
+                    <Typography variant="subtitle2" component="p" sx={{ fontWeight: 700 }}>{t.author}</Typography>
                     <Typography variant="caption" color="text.secondary">{t.role}, {t.company}</Typography>
                   </Box>
                 </Stack>

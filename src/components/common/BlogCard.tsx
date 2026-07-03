@@ -40,8 +40,8 @@ export default function BlogCard({ blog, compact = false }: BlogCardProps) {
       <CardActions sx={{ px: 2, pb: 2, pt: 0, justifyContent: 'space-between' }}>
         <Button size="small" endIcon={<ArrowForwardIcon />} component={Link} href={`/blogs/${blog.id}-${blog.slug}`}>Read More</Button>
         <Stack direction="row" spacing={0.5}>
-          <Tooltip title={isLiked ? 'Unlike' : 'Like'}><IconButton size="small" onClick={() => dispatch(toggleLike(blog.id))}>{isLiked ? <FavoriteIcon sx={{ fontSize: 18, color: 'error.main' }} /> : <FavoriteBorderIcon sx={{ fontSize: 18 }} />}</IconButton></Tooltip>
-          <Tooltip title={isBookmarked ? 'Remove Bookmark' : 'Bookmark'}><IconButton size="small" onClick={() => dispatch(toggleBookmark(blog.id))}>{isBookmarked ? <BookmarkIcon sx={{ fontSize: 18, color: 'primary.main' }} /> : <BookmarkBorderIcon sx={{ fontSize: 18 }} />}</IconButton></Tooltip>
+          <Tooltip title={isLiked ? 'Unlike' : 'Like'}><IconButton size="small" onClick={() => dispatch(toggleLike(blog.id))} aria-label={isLiked ? 'Unlike' : 'Like'}>{isLiked ? <FavoriteIcon sx={{ fontSize: 18, color: 'error.main' }} /> : <FavoriteBorderIcon sx={{ fontSize: 18 }} />}</IconButton></Tooltip>
+          <Tooltip title={isBookmarked ? 'Remove Bookmark' : 'Bookmark'}><IconButton size="small" onClick={() => dispatch(toggleBookmark(blog.id))} aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark'}>{isBookmarked ? <BookmarkIcon sx={{ fontSize: 18, color: 'primary.main' }} /> : <BookmarkBorderIcon sx={{ fontSize: 18 }} />}</IconButton></Tooltip>
         </Stack>
       </CardActions>
     </Card>

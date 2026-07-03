@@ -152,6 +152,7 @@ export default function HeroSection() {
 
               <Typography
                 variant="h6"
+                component="p"
                 sx={{ color: 'rgba(255,255,255,0.72)', lineHeight: 1.75, fontWeight: 400, maxWidth: 520 }}
               >
                 {slide.body}

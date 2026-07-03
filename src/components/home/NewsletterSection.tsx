@@ -45,7 +45,7 @@ export default function NewsletterSection() {
       <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
         <Chip icon={<MailOutlineIcon sx={{ color: '#7dd3fc !important' }} />} label="Newsletter" sx={{ mb: 3, bgcolor: 'rgba(14,165,233,0.15)', color: '#7dd3fc', border: '1px solid rgba(14,165,233,0.3)', fontWeight: 600 }} />
         <Typography variant="h3" sx={{ fontWeight: 800, color: 'white', mb: 2, fontSize: { xs: '2rem', md: '2.75rem' } }}>Stay Ahead of AI Trends</Typography>
-        <Typography variant="h6" sx={{ color: 'rgba(255,255,255,0.65)', mb: 4, lineHeight: 1.7 }}>Join over 50,000 subscribers and get weekly AI insights, research summaries, and industry news delivered to your inbox.</Typography>
+        <Typography variant="h6" component="p" sx={{ color: 'rgba(255,255,255,0.65)', mb: 4, lineHeight: 1.7 }}>Join over 50,000 subscribers and get weekly AI insights, research summaries, and industry news delivered to your inbox.</Typography>
         {subscribed ? (
           <Paper elevation={0} sx={{ p: 3, bgcolor: 'rgba(16,185,129,0.15)', borderRadius: 3, border: '1px solid rgba(16,185,129,0.3)', display: 'inline-flex', alignItems: 'center', gap: 2 }}><CheckCircleIcon sx={{ color: '#34d399' }} /><Typography sx={{ color: '#34d399', fontWeight: 600 }}>You're subscribed! Welcome to the AI Insights Blogs community.</Typography></Paper>
         ) : (

@@ -113,7 +113,7 @@ export default function BlogDetailView({ blog, otherArticles, relatedBlogs }: Bl
               <Stack direction="row" sx={{ alignItems: 'center', gap: 1.5 }}>
                 <Tooltip title={isLiked ? 'Unlike' : 'Like'}>
                   <Stack direction="row" sx={{ alignItems: 'center', gap: 0.25 }}>
-                    <IconButton size="small" onClick={() => likeMutation.mutate()} disabled={likeMutation.isPending}>
+                    <IconButton size="small" onClick={() => likeMutation.mutate()} disabled={likeMutation.isPending} aria-label={isLiked ? 'Unlike' : 'Like'}>
                       {isLiked ? <FavoriteIcon sx={{ fontSize: 18, color: 'error.main' }} /> : <FavoriteBorderIcon sx={{ fontSize: 18 }} />}
                     </IconButton>
                     <Typography variant="caption" color="text.secondary">{formatNumber(likesData?.likes ?? blog.likes)}</Typography>
@@ -121,7 +121,7 @@ export default function BlogDetailView({ blog, otherArticles, relatedBlogs }: Bl
                 </Tooltip>
                 <Tooltip title={isBookmarked ? 'Remove bookmark' : 'Bookmark'}>
                   <Stack direction="row" sx={{ alignItems: 'center', gap: 0.25 }}>
-                    <IconButton size="small" onClick={() => bookmarkMutation.mutate()} disabled={bookmarkMutation.isPending}>
+                    <IconButton size="small" onClick={() => bookmarkMutation.mutate()} disabled={bookmarkMutation.isPending} aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark'}>
                       {isBookmarked ? <BookmarkIcon sx={{ fontSize: 18, color: 'primary.main' }} /> : <BookmarkBorderIcon sx={{ fontSize: 18 }} />}
                     </IconButton>
                     <Typography variant="caption" color="text.secondary">{formatNumber(bookmarksData?.bookmarks ?? blog.bookmarks)}</Typography>
@@ -129,7 +129,7 @@ export default function BlogDetailView({ blog, otherArticles, relatedBlogs }: Bl
                 </Tooltip>
                 <Tooltip title="Share">
                   <Stack direction="row" sx={{ alignItems: 'center', gap: 0.25 }}>
-                    <IconButton size="small" onClick={handleShare}>
+                    <IconButton size="small" onClick={handleShare} aria-label="Share">
                       <ShareIcon sx={{ fontSize: 18 }} />
                     </IconButton>
                     <Typography variant="caption" color="text.secondary">{formatNumber(sharesData?.shares ?? 0)}</Typography>
