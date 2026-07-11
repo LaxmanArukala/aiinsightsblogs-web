@@ -6,6 +6,7 @@ const nextConfig = {
   images: { unoptimized: true },
   experimental: {
     optimizePackageImports: ['@mui/material', '@mui/icons-material'],
+    optimizeCss: true,
   },
 };
 

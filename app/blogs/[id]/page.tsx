@@ -1,3 +1,4 @@
+import { preload } from 'react-dom';
 import BlogDetailView from '@/src/components/blog/BlogDetailView';
 import { blogService } from '@/src/services/blogService';
 import type { Blog } from '@/src/types';
@@ -18,6 +19,10 @@ export default async function BlogDetailPage({ params }: Props) {
   if (!detail) return <BlogDetailView blog={null} otherArticles={[]} relatedBlogs={[]} />;
 
   const blog = detail.blog;
+
+  if (blog.featuredImage) {
+    preload(blog.featuredImage, { as: 'image', fetchPriority: 'high' });
+  }
 
   const [otherData, relatedBlogs] = await Promise.all([
     blogService.getBlogs({ sort: 'latest', page: 1 }).catch(() => ({ data: [] as Blog[] })),

@@ -12,18 +12,26 @@ import ShareIcon from '@mui/icons-material/Share';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import { useRef, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Navbar from '@/src/components/layout/Navbar';
 import BlogImage from '@/src/components/common/BlogImage';
 import Footer from '@/src/components/layout/Footer';
 import BlogContentRenderer from '@/src/components/blog/BlogContentRenderer';
-import CommentsSection from '@/src/components/comments/CommentsSection';
-import ReviewsSection from '@/src/components/reviews/ReviewsSection';
 import { blogService } from '@/src/services/blogService';
 import { formatDate, formatNumber } from '@/src/utils/formatters';
 import { useAppDispatch } from '@/src/redux/hooks';
 import { showSnackbar } from '@/src/redux/slices/uiSlice';
 import type { Blog } from '@/src/types';
+
+const CommentsSection = dynamic(() => import('@/src/components/comments/CommentsSection'), {
+  ssr: false,
+  loading: () => <Box sx={{ minHeight: 200 }} />,
+});
+const ReviewsSection = dynamic(() => import('@/src/components/reviews/ReviewsSection'), {
+  ssr: false,
+  loading: () => <Box sx={{ minHeight: 200 }} />,
+});
 
 interface BlogDetailViewProps {
   blog: Blog | null;
