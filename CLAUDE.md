@@ -54,4 +54,25 @@ All API responses follow the envelope shape `{ status, message, data, errors }` 
 - `/blogs/[id]` — blog detail (`app/blogs/[id]/page.tsx`)
 - `/about` — about page (`app/about/page.tsx`)
 
-**Deployment:** Netlify — `npm run build`, publish dir `.next`.
+**Deployment:** AWS EC2 (ap-south-2), served by PM2 behind nginx.
+
+```bash
+# from a local checkout — there is no git repo on the server
+rsync -avz --exclude='.next' --exclude='node_modules' --exclude='.git' \
+  ./ ec2-user@<EC2_HOST>:/home/ec2-user/aiinsightsblogs-web/
+# then on the box:
+npm run build && pm2 restart aiinsightsblogs-web
+```
+
+PM2 runs `npm start` (port 3000) as `aiinsightsblogs-web`; the backend API is a
+separate process, `aiinsightsblog-svc`.
+
+Notes:
+- `.env.production` lives on the server and is picked up by rsync (it is gitignored,
+  not rsync-excluded). Next.js loads it automatically at build time, and every
+  `NEXT_PUBLIC_*` value is inlined then — not at runtime — so the file must be
+  present before `npm run build`.
+- The app cannot be statically exported: `/blogs` and `/og/[id]` are dynamic and
+  `/blogs/[id]` uses ISR, so it needs a live Node server.
+- `rsync` runs without `--delete`, so files deleted locally must be removed on the
+  server by hand.

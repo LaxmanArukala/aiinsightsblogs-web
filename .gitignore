@@ -50,8 +50,6 @@ Thumbs.db
 # AWS Amplify
 .amplify/
 
-# Netlify
-.netlify/
 
 # logs
 logs

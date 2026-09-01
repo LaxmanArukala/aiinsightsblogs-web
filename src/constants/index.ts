@@ -7,8 +7,8 @@
  *
  * The analytics IDs intentionally have no hardcoded fallback: an unset value
  * disables the tag rather than silently reporting into the production property from
- * the wrong environment. They are set per environment in `.env.*` locally and in
- * Netlify's environment variables for deploys.
+ * the wrong environment. They are set per environment in `.env.*`; the deploy rsync
+ * copies `.env.production` to the EC2 box, where the build reads it.
  */
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://api.aiinsightsblogs.com';
 export const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? '';
