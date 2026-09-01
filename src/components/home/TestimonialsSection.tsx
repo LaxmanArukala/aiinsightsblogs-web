@@ -10,8 +10,8 @@ export default function TestimonialsSection({ testimonials }: TestimonialsSectio
   return (
     <Box sx={{ py: 8 }}>
       <Container maxWidth="xl">
-        <Typography variant="h3" sx={{ fontWeight: 800, mb: 2, fontSize: { xs: '1.75rem', md: '2.25rem' }, textAlign: 'center' }}>What Our Readers Say</Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 5, textAlign: 'center', maxWidth: 600, mx: 'auto', lineHeight: 1.7 }}>Join thousands of professionals who rely on AI Insights Blogs for expert analysis.</Typography>
+        <Typography variant="h3" component="h2" sx={{ fontWeight: 800, mb: 2, fontSize: { xs: '1.75rem', md: '2.25rem' }, textAlign: 'center' }}>What Our Readers Say</Typography>
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 5, textAlign: 'center', maxWidth: 600, mx: 'auto', lineHeight: 1.7 }}>What readers say about the guides and analysis published here.</Typography>
         <Grid container spacing={3}>
           {testimonials.map(t => (
             <Grid size={{ xs: 12, sm: 6, md: 4 }} key={t.id}>

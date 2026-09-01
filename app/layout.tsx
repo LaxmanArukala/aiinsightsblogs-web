@@ -4,11 +4,12 @@ import Script from 'next/script';
 import './globals.css';
 import AppProviders from '@/src/components/providers/AppProviders';
 import GlobalSnackbar from '@/src/components/common/GlobalSnackbar';
-import { SITE_NAME, SITE_DESCRIPTION, SITE_URL } from '@/src/constants';
+import { SITE_NAME, SITE_DESCRIPTION, SITE_URL, GA_MEASUREMENT_ID, GTM_CONTAINER_ID, ADSENSE_ID, BING_SITE_VERIFICATION } from '@/src/constants';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
 
 const OG_IMAGE = 'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=1200&auto=format&fit=crop&q=80';
+
 
 export const metadata: Metadata = {
   title: { default: `${SITE_NAME} — AI Agents, LLMs & Generative AI`, template: `%s | ${SITE_NAME}` },
@@ -21,8 +22,8 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 } },
   alternates: { canonical: SITE_URL },
   other: {
-    'msvalidate.01': '17E282211AB908B47BE26809503AA817',
-    ...(process.env.NEXT_PUBLIC_ADSENSE_ID && { 'google-adsense-account': process.env.NEXT_PUBLIC_ADSENSE_ID }),
+    ...(BING_SITE_VERIFICATION && { 'msvalidate.01': BING_SITE_VERIFICATION }),
+    ...(ADSENSE_ID && { 'google-adsense-account': ADSENSE_ID }),
   },
   openGraph: {
     title: `${SITE_NAME} — AI Agents, LLMs & Generative AI`,
@@ -45,21 +46,57 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://images.unsplash.com" />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
-        <Script
-          async
-          src="https://www.googletagmanager.com/gtag/js?id=G-6SYQDMZ6L0"
-          strategy="lazyOnload"
-        />
-        <Script id="google-analytics" strategy="lazyOnload">{`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-6SYQDMZ6L0');
-        `}</Script>
+        {/* Google Tag Manager */}
+        {GTM_CONTAINER_ID && (
+          <Script id="google-tag-manager" strategy="afterInteractive">{`
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','${GTM_CONTAINER_ID}');
+          `}</Script>
+        )}
+        {/* AdSense loader. ads.txt and the google-adsense-account meta tag only verify
+            ownership — this script is what actually requests and serves ads. */}
+        {ADSENSE_ID && (
+          <Script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_ID}`}
+            crossOrigin="anonymous"
+            strategy="afterInteractive"
+          />
+        )}
+        {GA_MEASUREMENT_ID && (
+          <>
+            <Script
+              async
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">{`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${GA_MEASUREMENT_ID}');
+            `}</Script>
+          </>
+        )}
       </head>
       <body className={inter.variable} suppressHydrationWarning>
+        {/* Google Tag Manager (noscript) */}
+        {GTM_CONTAINER_ID && (
+          <noscript>
+            <iframe
+              src={`https://www.googletagmanager.com/ns.html?id=${GTM_CONTAINER_ID}`}
+              height="0"
+              width="0"
+              style={{ display: 'none', visibility: 'hidden' }}
+            />
+          </noscript>
+        )}
         <AppProviders>
           {children}
           <GlobalSnackbar />

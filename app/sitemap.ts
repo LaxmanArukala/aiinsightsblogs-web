@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { SITE_URL } from '@/src/constants';
+import { SITE_URL, API_BASE_URL } from '@/src/constants';
 
 export const revalidate = 3600;
 
@@ -16,9 +16,9 @@ interface RawMeta {
   total_pages: number;
 }
 
-async function fetchBlogPage(base: string, page: number): Promise<{ blogs: RawBlog[]; meta: RawMeta } | null> {
+async function fetchBlogPage(page: number): Promise<{ blogs: RawBlog[]; meta: RawMeta } | null> {
   try {
-    const res = await fetch(`${base}/api/v1/blogs?limit=100&page=${page}`, { next: { revalidate: 3600 } });
+    const res = await fetch(`${API_BASE_URL}/api/v1/blogs?limit=100&page=${page}`, { next: { revalidate: 3600 } });
     if (!res.ok) return null;
     const json = await res.json();
     return { blogs: json?.data?.data ?? [], meta: json?.data?.meta };
@@ -28,15 +28,14 @@ async function fetchBlogPage(base: string, page: number): Promise<{ blogs: RawBl
 }
 
 async function fetchAllBlogs(): Promise<RawBlog[]> {
-  const base = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://api.aiinsightsblogs.com';
-  const first = await fetchBlogPage(base, 1);
+  const first = await fetchBlogPage(1);
   if (!first) return [];
 
   const allBlogs: RawBlog[] = [...first.blogs];
   const totalPages = first.meta?.total_pages ?? 1;
 
   const remaining = await Promise.all(
-    Array.from({ length: totalPages - 1 }, (_, i) => fetchBlogPage(base, i + 2)),
+    Array.from({ length: totalPages - 1 }, (_, i) => fetchBlogPage(i + 2)),
   );
   for (const result of remaining) {
     if (result) allBlogs.push(...result.blogs);

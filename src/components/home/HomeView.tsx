@@ -16,18 +16,21 @@ interface HomeViewProps {
   featured: Blog[];
   latest: Blog[];
   testimonials: Testimonial[];
+  articleCount: number;
 }
 
-export default function HomeView({ featured, latest, testimonials }: HomeViewProps) {
+export default function HomeView({ featured, latest, testimonials, articleCount }: HomeViewProps) {
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
       <Box component="main" sx={{ flexGrow: 1 }}>
-        <HeroSection />
-        <AboutSection />
+        <HeroSection articleCount={articleCount} />
+        {/* Articles lead: a reader arriving from search should hit real content
+            before an About essay, so AboutSection now sits below the archive. */}
         <TrendingTopics />
         <FeaturedBlogs blogs={featured} />
-        <LatestArticles blogs={latest} />
+        <LatestArticles blogs={latest} articleCount={articleCount} />
+        <AboutSection articleCount={articleCount} />
         {testimonials.length > 0 && <TestimonialsSection testimonials={testimonials} />}
         <NewsletterSection />
       </Box>

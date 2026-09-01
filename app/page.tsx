@@ -23,7 +23,7 @@ export default async function HomePage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <HomeView featured={featured} latest={all.data} testimonials={testimonials} />
+      <HomeView featured={featured} latest={all.data} testimonials={testimonials} articleCount={all.total} />
     </>
   );
 }

@@ -34,6 +34,7 @@ export interface Blog {
   tags: Tag[];
   author: Author;
   publishedAt: string;
+  updatedAt: string;
   readTime: number;
   views: number;
   likes: number;
@@ -86,7 +87,7 @@ export interface TeamMember {
   linkedin?: string;
 }
 
-export type SortOption = 'latest' | 'most-viewed' | 'most-popular' | 'highest-rated';
+export type SortOption = 'latest' | 'oldest' | 'most_viewed' | 'most_liked' | 'top_rated';
 
 export interface BlogFilters {
   search: string;

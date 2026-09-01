@@ -1,274 +1,238 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { Box, Container, Grid, Typography, Button, Stack, Chip } from '@mui/material';
+import { Box, Container, Typography, Button, Stack, useTheme } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import Link from 'next/link';
+import AuroraBackground from '@/src/components/home/AuroraBackground';
+import { AI_TOPICS } from '@/src/constants';
 
-const SLIDES = [
-  {
-    chip: 'AI Agents',
-    chipColor: '#0ea5e9',
-    heading: 'Master the Era of',
-    highlight: 'Autonomous AI Agents',
-    body: 'Explore how AI agents plan, reason, and act — from the ReAct pattern and LangChain to multi-agent systems, production deployment, and beyond. Practical deep-dives for builders.',
-    cta: { label: 'Explore AI Agents', href: '/blogs?category=ai-agents' },
-    image: 'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=900&auto=format&fit=crop&q=80',
-    imageAlt: 'AI Agents — autonomous systems visualization',
-  },
-  {
-    chip: 'Large Language Models',
-    chipColor: '#10b981',
-    heading: 'Unlock the Power of',
-    highlight: 'Large Language Models',
-    body: 'From transformer architecture and fine-tuning with LoRA, to RAG pipelines, prompt engineering, and running open-source models locally — everything you need to build with LLMs.',
-    cta: { label: 'Explore LLMs', href: '/blogs?category=llms' },
-    image: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=900&auto=format&fit=crop&q=80',
-    imageAlt: 'Large Language Models — neural network visualization',
-  },
-  {
-    chip: 'Generative AI',
-    chipColor: '#f59e0b',
-    heading: 'Create Anything with',
-    highlight: 'Generative AI',
-    body: 'Stable Diffusion, DALL-E, Sora, multimodal models, and enterprise use cases — discover how generative AI is transforming art, design, video, music, and every creative discipline.',
-    cta: { label: 'Explore Generative AI', href: '/blogs?category=generative-ai' },
-    image: 'https://images.unsplash.com/photo-1682686580391-615b1f28e5ee?w=900&auto=format&fit=crop&q=80',
-    imageAlt: 'Generative AI — creative AI visualization',
-  },
-  {
-    chip: 'Stay Ahead',
-    chipColor: '#8b5cf6',
-    heading: 'Your Go-To Source for',
-    highlight: 'AI Knowledge',
-    body: 'Practitioner-written tutorials, honest comparisons, and hands-on code examples — all free, all in one place. Join thousands of engineers and researchers keeping pace with AI.',
-    cta: { label: 'Browse All Articles', href: '/blogs' },
-    image: 'https://images.unsplash.com/photo-1526379095098-d400fd0bf935?w=900&auto=format&fit=crop&q=80',
-    imageAlt: 'AI Insights Blogs — knowledge and learning',
-  },
-];
+interface HeroSectionProps {
+  /** Live total from the API — never hardcode it, the archive grows daily. */
+  articleCount: number;
+}
 
-const AUTOPLAY_MS = 5000;
+export default function HeroSection({ articleCount }: HeroSectionProps) {
+  const isDark = useTheme().palette.mode === 'dark';
 
-export default function HeroSection() {
-  const [active, setActive] = useState(0);
-  const [transitioning, setTransitioning] = useState(false);
-  const [dir, setDir] = useState<'next' | 'prev'>('next');
-  const count = SLIDES.length;
+  const ink = isDark ? '#ffffff' : '#0b1220';
+  const muted = isDark ? 'rgba(255,255,255,0.62)' : 'rgba(15,23,42,0.62)';
+  const hairline = isDark ? 'rgba(255,255,255,0.16)' : 'rgba(15,23,42,0.14)';
 
-  const goTo = useCallback(
-    (index: number, direction: 'next' | 'prev' = 'next') => {
-      if (transitioning) return;
-      setDir(direction);
-      setTransitioning(true);
-      setTimeout(() => {
-        setActive((index + count) % count);
-        setTransitioning(false);
-      }, 400);
-    },
-    [transitioning, count],
-  );
-
-  const next = useCallback(() => goTo(active + 1, 'next'), [active, goTo]);
-
-  useEffect(() => {
-    const id = setInterval(next, AUTOPLAY_MS);
-    return () => clearInterval(id);
-  }, [next]);
-
-  const slide = SLIDES[active];
-
-  const textAnim = {
-    opacity: transitioning ? 0 : 1,
-    transform: transitioning
-      ? dir === 'next' ? 'translateY(16px)' : 'translateY(-16px)'
-      : 'translateY(0)',
-    transition: 'opacity 0.4s ease, transform 0.4s ease',
-  };
-
-  const imgAnim = {
-    opacity: transitioning ? 0 : 1,
-    transform: transitioning
-      ? dir === 'next' ? 'translateX(24px) scale(0.97)' : 'translateX(-24px) scale(0.97)'
-      : 'translateX(0) scale(1)',
-    transition: 'opacity 0.4s ease, transform 0.4s ease',
-  };
+  const stats = [
+    { value: articleCount > 0 ? `${articleCount.toLocaleString('en-US')}` : '—', label: 'Articles' },
+    { value: `${AI_TOPICS.length}`, label: 'Topics' },
+    { value: 'Free', label: 'Always' },
+  ];
 
   return (
     <Box
+      component="section"
       sx={{
         position: 'relative',
-        minHeight: { xs: '92vh', md: '88vh' },
+        minHeight: { xs: '86vh', md: '92vh' },
         display: 'flex',
         alignItems: 'center',
+        justifyContent: 'center',
         overflow: 'hidden',
-        background: 'linear-gradient(135deg, #0f172a 0%, #0c4a6e 50%, #164e63 100%)',
+        isolation: 'isolate',
+        // Each element rises in sequence so the composition assembles rather than
+        // appearing all at once.
+        '@keyframes heroRise': {
+          from: { opacity: 0, transform: 'translate3d(0, 22px, 0)' },
+          to:   { opacity: 1, transform: 'translate3d(0, 0, 0)' },
+        },
+        '@keyframes badgePulse': {
+          '0%, 100%': { boxShadow: `0 0 0 1px ${hairline}, 0 0 42px 0 rgba(56,189,248,0.28), 0 0 90px 0 rgba(168,85,247,0.18)` },
+          '50%':      { boxShadow: `0 0 0 1px ${hairline}, 0 0 62px 6px rgba(56,189,248,0.42), 0 0 120px 10px rgba(168,85,247,0.26)` },
+        },
+        '@media (prefers-reduced-motion: reduce)': {
+          '& *': { animation: 'none !important', opacity: '1 !important', transform: 'none !important' },
+        },
       }}
     >
-      {/* Ambient glow */}
-      <Box sx={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(ellipse at 20% 50%, rgba(14,165,233,0.18) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(16,185,129,0.08) 0%, transparent 50%)' }} />
+      <AuroraBackground />
 
-      <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1, py: { xs: 6, md: 8 } }}>
-        <Grid container spacing={{ xs: 5, md: 8 }} sx={{ alignItems: 'center' }}>
+      <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1, textAlign: 'center', py: { xs: 10, md: 12 } }}>
+        {/* Glowing brand mark */}
+        <Box
+          sx={{
+            width: { xs: 76, md: 92 },
+            height: { xs: 76, md: 92 },
+            mx: 'auto',
+            mb: { xs: 4, md: 5 },
+            borderRadius: '26px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            bgcolor: isDark ? 'rgba(15,23,42,0.72)' : 'rgba(255,255,255,0.82)',
+            backdropFilter: 'blur(12px)',
+            animation: 'heroRise 0.7s cubic-bezier(0.22,1,0.36,1) both, badgePulse 4.5s ease-in-out 0.7s infinite',
+          }}
+        >
+          <Box
+            sx={{
+              width: '58%',
+              height: '58%',
+              borderRadius: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'linear-gradient(135deg, #0ea5e9 0%, #10b981 100%)',
+              color: '#ffffff',
+              fontWeight: 900,
+              fontSize: { xs: '1.05rem', md: '1.25rem' },
+              letterSpacing: '-0.02em',
+            }}
+          >
+            AI
+          </Box>
+        </Box>
 
-          {/* ── Left: animated text ── */}
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Stack spacing={3.5} sx={textAnim}>
-              <Chip
-                label={slide.chip}
-                sx={{
-                  bgcolor: `${slide.chipColor}22`,
-                  color: slide.chipColor,
-                  fontWeight: 700,
-                  fontSize: '0.78rem',
-                  border: `1px solid ${slide.chipColor}55`,
-                  width: 'fit-content',
-                  letterSpacing: 0.5,
-                }}
-              />
+        <Typography
+          variant="h1"
+          sx={{
+            color: ink,
+            fontSize: { xs: '2.5rem', sm: '3.4rem', md: '4.4rem' },
+            fontWeight: 800,
+            lineHeight: 1.06,
+            letterSpacing: '-0.035em',
+            mb: 3,
+            animation: 'heroRise 0.7s cubic-bezier(0.22,1,0.36,1) 0.08s both',
+          }}
+        >
+          Make sense of AI,{' '}
+          <Box
+            component="span"
+            sx={{
+              background: 'linear-gradient(110deg, #38bdf8 0%, #a855f7 45%, #f97316 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}
+          >
+            one deep dive at a time
+          </Box>
+        </Typography>
 
-              <Typography
-                variant="h1"
-                sx={{
-                  color: 'white',
-                  fontSize: { xs: '2.4rem', sm: '3rem', md: '3.6rem' },
-                  fontWeight: 800,
-                  lineHeight: 1.1,
-                  letterSpacing: '-0.02em',
-                }}
-              >
-                {slide.heading}{' '}
-                <Box
-                  component="span"
-                  sx={{
-                    background: `linear-gradient(135deg, ${slide.chipColor}, #10b981)`,
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                  }}
-                >
-                  {slide.highlight}
-                </Box>
-              </Typography>
+        <Typography
+          component="p"
+          sx={{
+            color: muted,
+            fontSize: { xs: '1.02rem', md: '1.18rem' },
+            lineHeight: 1.75,
+            maxWidth: 620,
+            mx: 'auto',
+            mb: 5,
+            animation: 'heroRise 0.7s cubic-bezier(0.22,1,0.36,1) 0.16s both',
+          }}
+        >
+          Practical guides and honest analysis on AI agents, large language models,
+          and generative AI — written for the people who actually build with them.
+        </Typography>
 
-              <Typography
-                variant="h6"
-                component="p"
-                sx={{ color: 'rgba(255,255,255,0.72)', lineHeight: 1.75, fontWeight: 400, maxWidth: 520 }}
-              >
-                {slide.body}
-              </Typography>
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={2}
+          sx={{ justifyContent: 'center', mb: 6, animation: 'heroRise 0.7s cubic-bezier(0.22,1,0.36,1) 0.24s both' }}
+        >
+          <Button
+            component={Link}
+            href="/blogs"
+            size="large"
+            endIcon={<ArrowForwardIcon />}
+            sx={{
+              px: 4,
+              py: 1.5,
+              borderRadius: 999,
+              fontWeight: 700,
+              textTransform: 'none',
+              fontSize: '1rem',
+              bgcolor: isDark ? '#ffffff' : '#0b1220',
+              color: isDark ? '#0b1220' : '#ffffff',
+              '&:hover': {
+                bgcolor: isDark ? 'rgba(255,255,255,0.88)' : 'rgba(11,18,32,0.86)',
+                transform: 'translateY(-2px)',
+              },
+              transition: 'transform 0.2s ease, background-color 0.2s ease',
+            }}
+          >
+            Browse all articles
+          </Button>
+          <Button
+            component={Link}
+            href="/blogs?category=ai-agents"
+            size="large"
+            sx={{
+              px: 4,
+              py: 1.5,
+              borderRadius: 999,
+              fontWeight: 600,
+              textTransform: 'none',
+              fontSize: '1rem',
+              color: ink,
+              border: `1px solid ${hairline}`,
+              bgcolor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.6)',
+              backdropFilter: 'blur(8px)',
+              '&:hover': {
+                bgcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.9)',
+                borderColor: isDark ? 'rgba(255,255,255,0.32)' : 'rgba(15,23,42,0.28)',
+                transform: 'translateY(-2px)',
+              },
+              transition: 'transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease',
+            }}
+          >
+            Start with AI agents
+          </Button>
+        </Stack>
 
-              <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap', pt: 0.5 }}>
-                <Button
-                  variant="contained"
-                  size="large"
-                  endIcon={<ArrowForwardIcon />}
-                  component={Link}
-                  href={slide.cta.href}
-                  sx={{
-                    bgcolor: slide.chipColor,
-                    '&:hover': { bgcolor: slide.chipColor, filter: 'brightness(0.88)' },
-                    px: 4,
-                    fontWeight: 700,
-                    borderRadius: 2,
-                  }}
-                >
-                  {slide.cta.label}
-                </Button>
-                <Button
-                  variant="outlined"
-                  size="large"
-                  component={Link}
-                  href="/blogs"
-                  sx={{
-                    borderColor: 'rgba(255,255,255,0.28)',
-                    color: 'rgba(255,255,255,0.85)',
-                    '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.06)' },
-                    px: 4,
-                    borderRadius: 2,
-                  }}
-                >
-                  All Articles
-                </Button>
-              </Stack>
-
-              {/* Stats */}
-              <Stack direction="row" spacing={5} sx={{ pt: 1 }}>
-                {[
-                  { value: '30+', label: 'Articles' },
-                  { value: '3', label: 'AI Topics' },
-                  { value: '100%', label: 'Free' },
-                ].map((s) => (
-                  <Box key={s.label}>
-                    <Typography variant="h5" sx={{ fontWeight: 800, color: 'white' }}>{s.value}</Typography>
-                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.55)' }}>{s.label}</Typography>
-                  </Box>
-                ))}
-              </Stack>
-            </Stack>
-          </Grid>
-
-          {/* ── Right: animated image ── */}
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Box sx={{ position: 'relative' }}>
-
-              {/* Image card */}
-              <Box
-                sx={{
-                  borderRadius: 4,
-                  overflow: 'hidden',
-                  boxShadow: '0 32px 80px rgba(0,0,0,0.5)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  ...imgAnim,
-                }}
-              >
-                <Box
-                  component="img"
-                  src={slide.image}
-                  alt={slide.imageAlt}
-                  sx={{
-                    width: '100%',
-                    height: { xs: 260, sm: 340, md: 420 },
-                    objectFit: 'cover',
-                    display: 'block',
-                  }}
-                />
-                {/* Gradient overlay at bottom */}
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    bottom: 0, left: 0, right: 0,
-                    height: '40%',
-                    background: 'linear-gradient(to top, rgba(12,74,110,0.7) 0%, transparent 100%)',
-                    borderRadius: '0 0 16px 16px',
-                  }}
-                />
-              </Box>
-
-            </Box>
-          </Grid>
-
-        </Grid>
-
-        {/* Dot indicators — centred below full section */}
-        <Stack direction="row" spacing={0.75} sx={{ justifyContent: 'center', mt: 4 }}>
-          {SLIDES.map((s, i) => (
+        {/* Topic pills double as internal links into the category listings. */}
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{ justifyContent: 'center', flexWrap: 'wrap', gap: 1, mb: 6, animation: 'heroRise 0.7s cubic-bezier(0.22,1,0.36,1) 0.32s both' }}
+        >
+          {AI_TOPICS.map((topic) => (
             <Box
-              key={s.chip}
-              onClick={() => goTo(i, i > active ? 'next' : 'prev')}
+              key={topic.id}
+              component={Link}
+              href={`/blogs?category=${topic.slug}`}
               sx={{
-                width: i === active ? 28 : 8,
-                height: 8,
-                borderRadius: 4,
-                bgcolor: i === active ? slide.chipColor : 'rgba(255,255,255,0.28)',
-                cursor: 'pointer',
-                transition: 'all 0.35s ease',
-                '&:hover': { bgcolor: i === active ? slide.chipColor : 'rgba(255,255,255,0.55)' },
+                px: 2,
+                py: 0.75,
+                borderRadius: 999,
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                textDecoration: 'none',
+                color: muted,
+                border: `1px solid ${hairline}`,
+                transition: 'all 0.2s ease',
+                '&:hover': { color: topic.color, borderColor: topic.color },
               }}
-            />
+            >
+              {topic.name}
+            </Box>
           ))}
         </Stack>
 
+        <Stack
+          direction="row"
+          sx={{
+            justifyContent: 'center',
+            gap: { xs: 4, md: 7 },
+            animation: 'heroRise 0.7s cubic-bezier(0.22,1,0.36,1) 0.4s both',
+          }}
+        >
+          {stats.map((s) => (
+            <Box key={s.label}>
+              <Typography sx={{ fontWeight: 800, fontSize: { xs: '1.5rem', md: '1.9rem' }, color: ink, lineHeight: 1.1 }}>
+                {s.value}
+              </Typography>
+              <Typography sx={{ fontSize: '0.8rem', color: muted, letterSpacing: '0.08em', textTransform: 'uppercase', mt: 0.5 }}>
+                {s.label}
+              </Typography>
+            </Box>
+          ))}
+        </Stack>
       </Container>
     </Box>
   );
