@@ -60,13 +60,18 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           `}</Script>
         )}
         {/* AdSense loader. ads.txt and the google-adsense-account meta tag only verify
-            ownership — this script is what actually requests and serves ads. */}
+            ownership — this script is what actually requests and serves ads.
+
+            Deliberately a plain <script>, not next/script: with strategy
+            "afterInteractive" Next injects the tag client-side after hydration, so
+            the raw HTML contained only a <link rel="preload"> and the RSC payload.
+            AdSense verification looks for the literal tag in the page source, so a
+            client-injected one can leave a site stuck as unverified. */}
         {ADSENSE_ID && (
-          <Script
+          <script
             async
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_ID}`}
             crossOrigin="anonymous"
-            strategy="afterInteractive"
           />
         )}
         {GA_MEASUREMENT_ID && (
