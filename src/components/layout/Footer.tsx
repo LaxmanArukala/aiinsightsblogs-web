@@ -58,11 +58,21 @@ export default function Footer() {
                 <Typography variant="h6" sx={{ fontWeight: 800 }}>{SITE_NAME}</Typography>
               </Box>
               <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8 }}>{SITE_DESCRIPTION}</Typography>
+              {/*
+                Social links are commented out until real profile URLs exist.
+                As written these IconButtons carried no `href`, so they rendered as
+                clickable icons that did nothing — on every page of the site.
+
+                To restore: add the real URLs below, keep component="a" with
+                target="_blank" and rel="noopener noreferrer", and give each an
+                aria-label so the icon has an accessible name.
+
               <Stack direction="row" spacing={1}>
-                <IconButton size="small" sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main' } }}><TwitterIcon fontSize="small" /></IconButton>
-                <IconButton size="small" sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main' } }}><LinkedInIcon fontSize="small" /></IconButton>
-                <IconButton size="small" sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main' } }}><GitHubIcon fontSize="small" /></IconButton>
+                <IconButton size="small" component="a" href="https://x.com/<handle>" target="_blank" rel="noopener noreferrer" aria-label="AI Insights Blogs on X" sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main' } }}><TwitterIcon fontSize="small" /></IconButton>
+                <IconButton size="small" component="a" href="https://www.linkedin.com/company/<slug>" target="_blank" rel="noopener noreferrer" aria-label="AI Insights Blogs on LinkedIn" sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main' } }}><LinkedInIcon fontSize="small" /></IconButton>
+                <IconButton size="small" component="a" href="https://github.com/<org>" target="_blank" rel="noopener noreferrer" aria-label="AI Insights Blogs on GitHub" sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main' } }}><GitHubIcon fontSize="small" /></IconButton>
               </Stack>
+              */}
             </Stack>
           </Grid>
           {Object.entries(footerLinks).map(([section, links]) => (
