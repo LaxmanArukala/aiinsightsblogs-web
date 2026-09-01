@@ -1,23 +1,25 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, Container, Grid, Typography, TextField, Button, Stack, Paper, Chip, MenuItem, Link as MuiLink } from '@mui/material';
+import { Box, Container, Grid, Typography, TextField, Button, Stack, MenuItem, Link as MuiLink, Accordion, AccordionSummary, AccordionDetails, useTheme } from '@mui/material';
 import Link from 'next/link';
 import MailOutlinedIcon from '@mui/icons-material/MailOutlined';
 import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
+import HandshakeOutlinedIcon from '@mui/icons-material/HandshakeOutlined';
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import SendOutlinedIcon from '@mui/icons-material/SendOutlined';
-import TwitterIcon from '@mui/icons-material/Twitter';
-import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import GitHubIcon from '@mui/icons-material/GitHub';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ScheduleOutlinedIcon from '@mui/icons-material/ScheduleOutlined';
 import Navbar from '@/src/components/layout/Navbar';
 import Footer from '@/src/components/layout/Footer';
 import { useAppDispatch } from '@/src/redux/hooks';
 import { showSnackbar } from '@/src/redux/slices/uiSlice';
-import { SITE_NAME } from '@/src/constants';
+import { SITE_NAME, SITE_URL } from '@/src/constants';
 import apiClient from '@/src/services/apiClient';
+
+const CONTACT_EMAIL = 'aiinsightsblogs@gmail.com';
 
 const SUBJECTS = [
   'General Enquiry',
@@ -28,35 +30,43 @@ const SUBJECTS = [
   'Other',
 ];
 
-const CONTACT_CARDS = [
+const REASONS = [
+  { icon: <EditNoteOutlinedIcon />, color: '#0ea5e9', title: 'Corrections', body: 'Spotted a factual error or something out of date? Tell us which article and we will review it.' },
+  { icon: <BugReportOutlinedIcon />, color: '#ef4444', title: 'Disputes', body: 'If something here is misleading or objectionable, raise it. Every report is read.' },
+  { icon: <LightbulbOutlinedIcon />, color: '#f59e0b', title: 'Suggestions', body: 'A topic you want covered, or a gap you have noticed in the archive.' },
+  { icon: <HandshakeOutlinedIcon />, color: '#10b981', title: 'Anything else', body: 'Partnerships, collaborations, or a question that does not fit the boxes above.' },
+];
+
+/**
+ * FAQ answers double as FAQPage structured data below, so the two must stay in
+ * step — Google treats markup that disagrees with the visible page as a violation.
+ */
+const FAQS = [
   {
-    icon: <EditNoteOutlinedIcon />,
-    color: '#0ea5e9',
-    title: 'Content Corrections',
-    body: 'Spotted a factual error or outdated information? Let us know and we\'ll review and fix it promptly.',
+    q: 'Who writes the articles on this site?',
+    a: 'Articles are researched and drafted by advanced AI models. We state that openly rather than implying a newsroom that does not exist.',
   },
   {
-    icon: <BugReportOutlinedIcon />,
-    color: '#ef4444',
-    title: 'Content Disputes',
-    body: 'If content on this site is misleading or objectionable, raise a dispute. We take all reports seriously.',
+    q: 'How do I report a factual error?',
+    a: 'Use the form on this page and pick "Content Correction". Include the article title or URL and what you believe is wrong, and we will review it.',
   },
   {
-    icon: <LightbulbOutlinedIcon />,
-    color: '#f59e0b',
-    title: 'Suggestions',
-    body: 'Have a topic you\'d like us to cover? We\'re always looking for new article ideas from our readers.',
+    q: 'Is the content free to read?',
+    a: 'Yes. Every article is free, with no account, no paywall and no newsletter gate.',
   },
   {
-    icon: <MailOutlinedIcon />,
-    color: '#10b981',
-    title: 'General Contact',
-    body: 'Partnerships, collaborations, or anything else — drop us a message and we\'ll get back to you.',
+    q: 'How quickly will I get a reply?',
+    a: 'We aim to respond within 1–2 business days.',
+  },
+  {
+    q: 'Can I republish or quote an article?',
+    a: 'Short quotes with a link back are welcome. For anything longer, please ask first — see the Terms and Conditions.',
   },
 ];
 
 export default function ContactPage() {
   const dispatch = useAppDispatch();
+  const isDark = useTheme().palette.mode === 'dark';
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
@@ -99,199 +109,224 @@ export default function ContactPage() {
     }
   };
 
+  const faqLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: FAQS.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  };
+
+  const panel = {
+    p: { xs: 3, md: 4.5 },
+    borderRadius: '14px',
+    border: '1px solid',
+    borderColor: 'divider',
+    bgcolor: 'background.paper',
+  };
+
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
       <Navbar />
 
-      {/* ── Hero ── */}
-      <Box
-        sx={{
-          position: 'relative',
-          overflow: 'hidden',
-          background: 'linear-gradient(160deg, #0a0f1e 0%, #0f172a 60%, #0c2340 100%)',
-          py: { xs: 8, md: 11 },
-          textAlign: 'center',
-        }}
-      >
-        <Box sx={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(ellipse at 25% 60%, rgba(14,165,233,0.15) 0%, transparent 55%), radial-gradient(ellipse at 80% 20%, rgba(16,185,129,0.08) 0%, transparent 50%)', pointerEvents: 'none' }} />
-        <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
-          <Chip
-            label="Get In Touch"
-            size="small"
-            icon={<MailOutlinedIcon style={{ fontSize: 14, color: '#0ea5e9' }} />}
-            sx={{ bgcolor: 'rgba(14,165,233,0.12)', color: '#0ea5e9', border: '1px solid rgba(14,165,233,0.25)', fontWeight: 700, letterSpacing: '0.08em', fontSize: '0.7rem', mb: 3 }}
-          />
-          <Typography variant="h1" sx={{ color: 'white', fontWeight: 800, fontSize: { xs: '2.4rem', md: '3.4rem' }, letterSpacing: '-0.03em', mb: 2 }}>
-            Contact Us
-          </Typography>
-          <Typography sx={{ color: 'rgba(255,255,255,0.6)', fontSize: '1.05rem', lineHeight: 1.8, maxWidth: 520, mx: 'auto' }}>
-            Have a correction, feedback, or just want to say hello? We read every message and respond promptly.
-          </Typography>
-        </Container>
-      </Box>
+      <Box component="main" sx={{ flexGrow: 1 }}>
+        {/* Form-first: the point of this page is the form, so it sits above the fold
+            beside the heading rather than below a tall banner. */}
+        <Box
+          component="section"
+          sx={{
+            pt: { xs: 6, md: 9 },
+            pb: { xs: 7, md: 10 },
+            background: isDark
+              ? 'radial-gradient(ellipse 70% 100% at 20% 0%, rgba(14,165,233,0.13) 0%, transparent 65%)'
+              : 'radial-gradient(ellipse 70% 100% at 20% 0%, rgba(14,165,233,0.10) 0%, transparent 65%)',
+          }}
+        >
+          <Container maxWidth="lg">
+            <Grid container spacing={{ xs: 5, md: 8 }} sx={{ alignItems: 'flex-start' }}>
+              <Grid size={{ xs: 12, md: 5 }}>
+                <Typography
+                  variant="h1"
+                  sx={{ fontWeight: 800, fontSize: { xs: '2.2rem', md: '3.1rem' }, lineHeight: 1.1, letterSpacing: '-0.035em', mb: 2.5 }}
+                >
+                  Get in{' '}
+                  <Box component="span" sx={{ color: 'primary.main' }}>touch</Box>
+                </Typography>
+                <Typography sx={{ color: 'text.secondary', fontSize: '1.05rem', lineHeight: 1.85, mb: 4, maxWidth: 420 }}>
+                  A correction, a dispute, an idea for something we should cover — or just
+                  hello. Every message to {SITE_NAME} is read.
+                </Typography>
 
-      <Box component="main" sx={{ flexGrow: 1, bgcolor: (t) => t.palette.mode === 'dark' ? '#0a0f1e' : '#f8fafc', py: { xs: 6, md: 10 } }}>
-        <Container maxWidth="lg">
-
-          {/* ── Reason cards ── */}
-          <Grid container spacing={2.5} sx={{ mb: 8 }}>
-            {CONTACT_CARDS.map((card) => (
-              <Grid size={{ xs: 12, sm: 6, md: 3 }} key={card.title}>
-                <Paper elevation={0} sx={{ p: 3, height: '100%', border: '1px solid', borderColor: 'divider', borderRadius: 3, borderTop: `3px solid ${card.color}`, transition: 'transform 0.2s, box-shadow 0.2s', '&:hover': { transform: 'translateY(-3px)', boxShadow: 4 } }}>
-                  <Box sx={{ width: 44, height: 44, borderRadius: 2, bgcolor: `${card.color}18`, color: card.color, display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2, '& svg': { fontSize: 22 } }}>
-                    {card.icon}
-                  </Box>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>{card.title}</Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.75 }}>{card.body}</Typography>
-                </Paper>
-              </Grid>
-            ))}
-          </Grid>
-
-          {/* ── Form + Info ── */}
-          <Grid container spacing={5} sx={{ alignItems: 'flex-start' }}>
-
-            {/* Form */}
-            <Grid size={{ xs: 12, md: 7 }}>
-              <Paper elevation={0} sx={{ p: { xs: 3, md: 5 }, border: '1px solid', borderColor: 'divider', borderRadius: 3 }}>
-                {submitted ? (
-                  <Stack spacing={2} sx={{ alignItems: 'center', py: 6, textAlign: 'center' }}>
-                    <Box sx={{ width: 72, height: 72, borderRadius: '50%', bgcolor: 'rgba(16,185,129,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <CheckCircleOutlinedIcon sx={{ fontSize: 40, color: '#10b981' }} />
+                <Stack spacing={2.5}>
+                  <Stack direction="row" sx={{ gap: 1.75, alignItems: 'center' }}>
+                    <Box sx={{ width: 42, height: 42, borderRadius: '11px', bgcolor: 'rgba(14,165,233,0.14)', color: 'primary.main', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <MailOutlinedIcon sx={{ fontSize: 21 }} />
                     </Box>
-                    <Typography variant="h5" sx={{ fontWeight: 700 }}>Message Sent!</Typography>
-                    <Typography color="text.secondary" sx={{ maxWidth: 380 }}>
-                      Thanks for reaching out. We'll review your message and get back to you as soon as possible.
-                    </Typography>
-                    <Button variant="outlined" onClick={() => { setSubmitted(false); setForm({ name: '', email: '', subject: '', message: '' }); }}>
-                      Send Another Message
-                    </Button>
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'text.secondary' }}>
+                        Email
+                      </Typography>
+                      <MuiLink href={`mailto:${CONTACT_EMAIL}`} underline="hover" sx={{ fontWeight: 600, color: 'text.primary', wordBreak: 'break-all' }}>
+                        {CONTACT_EMAIL}
+                      </MuiLink>
+                    </Box>
                   </Stack>
-                ) : (
-                  <Box component="form" onSubmit={handleSubmit} noValidate>
-                    <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>Send a Message</Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
-                      Fill in the form below and we'll get back to you within 1–2 business days.
-                    </Typography>
-                    <Stack spacing={2.5}>
-                      <Grid container spacing={2}>
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                          <TextField
-                            label="Your Name"
-                            fullWidth
-                            required
-                            value={form.name}
-                            onChange={handleChange('name')}
-                            error={!!errors.name}
-                            helperText={errors.name}
-                          />
-                        </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                          <TextField
-                            label="Email Address"
-                            type="email"
-                            fullWidth
-                            required
-                            value={form.email}
-                            onChange={handleChange('email')}
-                            error={!!errors.email}
-                            helperText={errors.email}
-                          />
-                        </Grid>
-                      </Grid>
-                      <TextField
-                        label="Subject"
-                        select
-                        fullWidth
-                        required
-                        value={form.subject}
-                        onChange={handleChange('subject')}
-                        error={!!errors.subject}
-                        helperText={errors.subject}
-                      >
-                        {SUBJECTS.map(s => <MenuItem key={s} value={s}>{s}</MenuItem>)}
-                      </TextField>
-                      <TextField
-                        label="Message"
-                        multiline
-                        rows={6}
-                        fullWidth
-                        required
-                        value={form.message}
-                        onChange={handleChange('message')}
-                        error={!!errors.message}
-                        helperText={errors.message || `${form.message.length} characters`}
-                      />
+                  <Stack direction="row" sx={{ gap: 1.75, alignItems: 'center' }}>
+                    <Box sx={{ width: 42, height: 42, borderRadius: '11px', bgcolor: 'rgba(16,185,129,0.14)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <ScheduleOutlinedIcon sx={{ fontSize: 21 }} />
+                    </Box>
+                    <Box>
+                      <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'text.secondary' }}>
+                        Response time
+                      </Typography>
+                      <Typography sx={{ fontWeight: 600 }}>1–2 business days</Typography>
+                    </Box>
+                  </Stack>
+                </Stack>
+              </Grid>
+
+              <Grid size={{ xs: 12, md: 7 }}>
+                <Box sx={{ ...panel, boxShadow: isDark ? 'none' : '0 18px 50px rgba(15,23,42,0.07)' }}>
+                  {submitted ? (
+                    <Stack spacing={2} sx={{ alignItems: 'center', py: 6, textAlign: 'center' }}>
+                      <Box sx={{ width: 72, height: 72, borderRadius: '50%', bgcolor: 'rgba(16,185,129,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <CheckCircleOutlinedIcon sx={{ fontSize: 40, color: '#10b981' }} />
+                      </Box>
+                      <Typography variant="h5" sx={{ fontWeight: 700 }}>Message sent</Typography>
+                      <Typography color="text.secondary" sx={{ maxWidth: 380 }}>
+                        Thanks for reaching out. We&apos;ll review your message and reply as soon as we can.
+                      </Typography>
                       <Button
-                        type="submit"
-                        variant="contained"
-                        size="large"
-                        disabled={loading}
-                        endIcon={<SendOutlinedIcon />}
-                        sx={{ alignSelf: 'flex-start', px: 4, fontWeight: 700, borderRadius: 2 }}
+                        onClick={() => { setSubmitted(false); setForm({ name: '', email: '', subject: '', message: '' }); }}
+                        sx={{ borderRadius: 999, px: 3, textTransform: 'none', fontWeight: 700, border: '1px solid', borderColor: 'divider' }}
                       >
-                        {loading ? 'Sending…' : 'Send Message'}
+                        Send another message
                       </Button>
                     </Stack>
-                  </Box>
-                )}
-              </Paper>
+                  ) : (
+                    <Box component="form" onSubmit={handleSubmit} noValidate>
+                      <Stack spacing={2.5}>
+                        <Grid container spacing={2}>
+                          <Grid size={{ xs: 12, sm: 6 }}>
+                            <TextField label="Your name" fullWidth required value={form.name} onChange={handleChange('name')} error={!!errors.name} helperText={errors.name} />
+                          </Grid>
+                          <Grid size={{ xs: 12, sm: 6 }}>
+                            <TextField label="Email address" type="email" fullWidth required value={form.email} onChange={handleChange('email')} error={!!errors.email} helperText={errors.email} />
+                          </Grid>
+                        </Grid>
+                        <TextField label="Subject" select fullWidth required value={form.subject} onChange={handleChange('subject')} error={!!errors.subject} helperText={errors.subject}>
+                          {SUBJECTS.map(s => <MenuItem key={s} value={s}>{s}</MenuItem>)}
+                        </TextField>
+                        <TextField
+                          label="Message" multiline rows={6} fullWidth required
+                          value={form.message} onChange={handleChange('message')}
+                          error={!!errors.message}
+                          helperText={errors.message || `${form.message.length} characters — 20 minimum`}
+                        />
+                        <Button
+                          type="submit"
+                          disabled={loading}
+                          endIcon={<SendOutlinedIcon />}
+                          sx={{
+                            alignSelf: 'flex-start', px: 4, py: 1.35, borderRadius: 999,
+                            fontWeight: 700, textTransform: 'none', fontSize: '0.98rem',
+                            bgcolor: 'primary.main', color: '#fff',
+                            '&:hover': { bgcolor: 'primary.dark' },
+                            '&.Mui-disabled': { bgcolor: 'action.disabledBackground', color: 'text.disabled' },
+                          }}
+                        >
+                          {loading ? 'Sending…' : 'Send message'}
+                        </Button>
+                      </Stack>
+                    </Box>
+                  )}
+                </Box>
+              </Grid>
             </Grid>
+          </Container>
+        </Box>
 
-            {/* Info sidebar */}
-            <Grid size={{ xs: 12, md: 5 }}>
-              <Stack spacing={3} sx={{ position: { md: 'sticky' }, top: { md: 96 } }}>
-                <Paper elevation={0} sx={{ p: 3.5, border: '1px solid', borderColor: 'divider', borderRadius: 3 }}>
-                  <Typography variant="h6" sx={{ fontWeight: 700, mb: 2.5 }}>Contact Info</Typography>
-                  <Stack spacing={2.5}>
-                    {[
-                      { label: 'General Enquiries', value: 'aiinsightsblogs@gmail.com' },
-                      { label: 'Content Corrections', value: 'aiinsightsblogs@gmail.com' },
-                      { label: 'Response Time', value: '1–2 business days' },
-                    ].map(({ label, value }) => (
-                      <Box key={label}>
-                        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.8 }}>{label}</Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 500, mt: 0.25 }}>{value}</Typography>
-                      </Box>
-                    ))}
+        {/* Reasons — a compact row, not the four cards the About page already uses */}
+        <Box component="section" sx={{ py: { xs: 7, md: 10 }, bgcolor: isDark ? 'rgba(148,163,184,0.05)' : '#f8fafc' }}>
+          <Container maxWidth="lg">
+            <Typography variant="h2" sx={{ fontWeight: 800, fontSize: { xs: '1.8rem', md: '2.4rem' }, letterSpacing: '-0.03em', mb: { xs: 4, md: 6 } }}>
+              What to write{' '}
+              <Box component="span" sx={{ color: 'primary.main' }}>about</Box>
+            </Typography>
+            <Grid container spacing={{ xs: 3, md: 5 }}>
+              {REASONS.map((r) => (
+                <Grid size={{ xs: 12, sm: 6 }} key={r.title}>
+                  <Stack direction="row" sx={{ gap: 2.25, alignItems: 'flex-start' }}>
+                    <Box sx={{ width: 44, height: 44, borderRadius: '11px', bgcolor: `${r.color}1f`, color: r.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, '& svg': { fontSize: 22 } }}>
+                      {r.icon}
+                    </Box>
+                    <Box>
+                      <Typography sx={{ fontWeight: 700, fontSize: '1.02rem', mb: 0.75 }}>{r.title}</Typography>
+                      <Typography sx={{ color: 'text.secondary', fontSize: '0.93rem', lineHeight: 1.7 }}>{r.body}</Typography>
+                    </Box>
                   </Stack>
-                </Paper>
-
-                <Paper elevation={0} sx={{ p: 3.5, border: '1px solid', borderColor: 'divider', borderRadius: 3 }}>
-                  <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>Follow Us</Typography>
-                  <Stack direction="row" spacing={1.5}>
-                    {[
-                      { icon: <TwitterIcon />, label: 'Twitter', color: '#1da1f2' },
-                      { icon: <LinkedInIcon />, label: 'LinkedIn', color: '#0077b5' },
-                      { icon: <GitHubIcon />, label: 'GitHub', color: '#6e40c9' },
-                    ].map(({ icon, label, color }) => (
-                      <Box key={label} sx={{ width: 44, height: 44, borderRadius: 2, bgcolor: `${color}18`, color, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s', '&:hover': { bgcolor: `${color}30`, transform: 'translateY(-2px)' }, '& svg': { fontSize: 22 } }}>
-                        {icon}
-                      </Box>
-                    ))}
-                  </Stack>
-                </Paper>
-
-                <Paper elevation={0} sx={{ p: 3.5, border: '1px solid', borderColor: 'divider', borderRadius: 3, background: 'linear-gradient(135deg, rgba(14,165,233,0.06) 0%, rgba(16,185,129,0.06) 100%)' }}>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>Quick Links</Typography>
-                  <Stack spacing={1}>
-                    {[
-                      { label: 'Browse All Articles', href: '/blogs' },
-                      { label: 'About AI Insights Blogs', href: '/about' },
-                      { label: 'Privacy Policy', href: '/privacy-policy' },
-                      { label: 'Terms and Conditions', href: '/terms-and-conditions' },
-                    ].map(({ label, href }) => (
-                      <MuiLink key={href} component={Link} href={href} underline="hover" sx={{ fontSize: '0.875rem', color: 'primary.main', fontWeight: 500 }}>
-                        → {label}
-                      </MuiLink>
-                    ))}
-                  </Stack>
-                </Paper>
-              </Stack>
+                </Grid>
+              ))}
             </Grid>
+          </Container>
+        </Box>
 
-          </Grid>
-        </Container>
+        {/* FAQ — accordion, and the source of the FAQPage markup above */}
+        <Box component="section" sx={{ py: { xs: 7, md: 10 } }}>
+          <Container maxWidth="md">
+            <Typography variant="h2" sx={{ fontWeight: 800, fontSize: { xs: '1.8rem', md: '2.4rem' }, letterSpacing: '-0.03em', textAlign: 'center', mb: { xs: 4, md: 6 } }}>
+              Common{' '}
+              <Box component="span" sx={{ color: 'primary.main' }}>questions</Box>
+            </Typography>
+            {FAQS.map((f) => (
+              <Accordion
+                key={f.q}
+                disableGutters
+                elevation={0}
+                sx={{
+                  bgcolor: 'transparent',
+                  borderBottom: '1px solid',
+                  borderColor: 'divider',
+                  '&:before': { display: 'none' },
+                }}
+              >
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ px: 0, py: 1 }}>
+                  <Typography sx={{ fontWeight: 700, fontSize: '1.02rem' }}>{f.q}</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ px: 0, pb: 3, pt: 0 }}>
+                  <Typography sx={{ color: 'text.secondary', lineHeight: 1.85 }}>{f.a}</Typography>
+                </AccordionDetails>
+              </Accordion>
+            ))}
+
+            <Stack direction="row" sx={{ gap: 2, flexWrap: 'wrap', justifyContent: 'center', mt: 5 }}>
+              {[
+                { label: 'Browse all articles', href: '/blogs' },
+                { label: 'About us', href: '/about' },
+                { label: 'Privacy policy', href: '/privacy-policy' },
+                { label: 'Terms and conditions', href: '/terms-and-conditions' },
+              ].map(({ label, href }) => (
+                <Box
+                  key={href}
+                  component={Link}
+                  href={href}
+                  sx={{
+                    px: 2, py: 0.8, borderRadius: 999, fontSize: '0.85rem', fontWeight: 600,
+                    textDecoration: 'none', color: 'text.secondary',
+                    border: '1px solid', borderColor: 'divider',
+                    transition: 'all 0.2s ease',
+                    '&:hover': { color: 'primary.main', borderColor: 'primary.main' },
+                  }}
+                >
+                  {label}
+                </Box>
+              ))}
+            </Stack>
+          </Container>
+        </Box>
       </Box>
 
       <Footer />
