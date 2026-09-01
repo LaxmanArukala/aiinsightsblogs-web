@@ -223,7 +223,7 @@ export default function BlogDetailView({ blog, otherArticles, relatedBlogs }: Bl
                   <Box>
                     <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
                       <Typography variant="h5" sx={{ fontWeight: 800 }}>Related Articles</Typography>
-                      <MuiLink component={Link} href={`/blogs?category=${blog.category.name}`} underline="hover" sx={{ fontSize: '0.875rem', color: 'primary.main', fontWeight: 600 }}>
+                      <MuiLink component={Link} href={`/blogs?category=${blog.category.slug}`} underline="hover" sx={{ fontSize: '0.875rem', color: 'primary.main', fontWeight: 600 }}>
                         View all →
                       </MuiLink>
                     </Stack>

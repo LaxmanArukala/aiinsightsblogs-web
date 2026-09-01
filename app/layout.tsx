@@ -59,6 +59,16 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             })(window,document,'script','dataLayer','${GTM_CONTAINER_ID}');
           `}</Script>
         )}
+        {/* AdSense loader. ads.txt and the google-adsense-account meta tag only verify
+            ownership — this script is what actually requests and serves ads. */}
+        {ADSENSE_ID && (
+          <Script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_ID}`}
+            crossOrigin="anonymous"
+            strategy="afterInteractive"
+          />
+        )}
         {GA_MEASUREMENT_ID && (
           <>
             <Script

@@ -1,6 +1,9 @@
 export const formatDate = (dateString: string): string => {
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  // timeZone is pinned: the server renders in UTC and the browser in the visitor's
+  // zone, so an unpinned date near midnight formats as a different day on each side
+  // and breaks hydration.
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
 };
 
 export const formatNumber = (num: number): string => {
@@ -11,7 +14,7 @@ export const formatNumber = (num: number): string => {
 
 export const formatDateTime = (dateString: string): string => {
   const date = new Date(dateString);
-  return date.toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  return date.toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
 };
 
 export const timeAgo = (dateString: string): string => {

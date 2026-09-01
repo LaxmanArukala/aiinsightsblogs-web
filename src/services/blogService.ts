@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { Blog, BlogFilters, PaginatedResponse, Comment, Review, ArticleDetailResponse, BlogStats } from '@/src/types';
+import type { Blog, BlogFilters, PaginatedResponse, Comment, Review, ArticleDetailResponse, BlogStats, Tag } from '@/src/types';
 import type { ApiEnvelope, RawBlog, RawBlogListResponse, RawBlogDetailResponse, RawTag, RawComment, RawCommentListResponse, RawReview, RawReviewListResponse, RawViewsData, RawLikesData, RawBookmarksData, RawSharesData } from '@/src/types/api';
 import { BLOGS_PER_PAGE } from '@/src/constants';
 import { getVisitorId } from '@/src/utils/visitorId';
@@ -9,6 +9,34 @@ import apiClient from './apiClient';
 function analyticsHeaders() {
   const id = getVisitorId();
   return id ? { 'x-visitor-id': id } : {};
+}
+
+function slugifyTag(value: string): string {
+  return value.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+}
+
+/**
+ * Tags are deduplicated by slug, keeping the first spelling seen.
+ *
+ * The API commonly returns both a title-case and a lowercase form of the same tag
+ * ('Prompt Engineering' and 'prompt engineering') — 55% of sampled posts had at
+ * least one such collision. Both slugify to the same value, which rendered
+ * duplicate chips and, because the slug is used as the React key, produced
+ * "Encountered two children with the same key" warnings.
+ */
+function mapTags(raw: RawBlog['tags']): Tag[] {
+  if (!Array.isArray(raw)) return [];
+  const seen = new Set<string>();
+  const tags: Tag[] = [];
+  for (const entry of raw) {
+    const tag: Tag = typeof entry === 'string'
+      ? { id: slugifyTag(entry), name: entry, slug: slugifyTag(entry) }
+      : (entry as RawTag);
+    if (!tag.slug || seen.has(tag.slug)) continue;
+    seen.add(tag.slug);
+    tags.push(tag);
+  }
+  return tags;
 }
 
 function mapBlog(raw: RawBlog): Blog {
@@ -26,15 +54,7 @@ function mapBlog(raw: RawBlog): Blog {
       slug:  raw.category.slug ?? raw.category.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
       color: raw.category.color ?? '#0ea5e9',
     } : { id: '', name: 'General', slug: 'general', color: '#0ea5e9' },
-    tags:        Array.isArray(raw.tags)
-      ? raw.tags.map((t) => {
-          if (typeof t === 'string') {
-            const slug = t.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-            return { id: slug, name: t, slug };
-          }
-          return t as RawTag;
-        })
-      : [],
+    tags:        mapTags(raw.tags),
     author:      raw.author ?? { id: '', name: 'AI Insights Blogs', avatar: '', bio: '' },
     publishedAt: raw.published_at,
     updatedAt:   raw.updated_at ?? raw.published_at,
@@ -117,7 +137,7 @@ export const blogService = {
 
   async getFeaturedBlogs(): Promise<Blog[]> {
     const { data: envelope } = await apiClient.get<ApiEnvelope<RawBlogListResponse>>('/api/v1/blogs', {
-      params: { featured: true, limit: 4 },
+      params: { featured: true, limit: 5 }, // 1 lead + 4 shortlist on the homepage
     });
     return envelope.data.data.map(mapBlog);
   },
