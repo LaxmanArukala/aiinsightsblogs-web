@@ -8,14 +8,19 @@ import ArticleIcon from '@mui/icons-material/Article';
 import SearchIcon from '@mui/icons-material/Search';
 import Navbar from '@/src/components/layout/Navbar';
 import Footer from '@/src/components/layout/Footer';
-import { SITE_NAME } from '@/src/constants';
+import { SITE_NAME, BLOG_CATEGORIES } from '@/src/constants';
 
-const QUICK_LINKS = [
-  { label: 'AI Agents', href: '/blogs?category=AI Agents' },
-  { label: 'LLMs', href: '/blogs?category=Large Language Models' },
-  { label: 'Generative AI', href: '/blogs?category=Generative AI' },
-  { label: 'Machine Learning', href: '/blogs?category=Machine Learning' },
-];
+/**
+ * Derived from BLOG_CATEGORIES so the slugs stay valid.
+ *
+ * These were previously hardcoded display names ('?category=AI Agents'). The API
+ * filters by slug only and returns zero results for a name, so all four recovery
+ * links on this 404 page led to an empty list.
+ */
+const QUICK_LINKS = BLOG_CATEGORIES.slice(0, 4).map((c) => ({
+  label: c.name,
+  href: `/blogs?category=${c.slug}`,
+}));
 
 export default function NotFound() {
   return (
