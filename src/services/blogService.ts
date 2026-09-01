@@ -3,6 +3,7 @@ import type { Blog, BlogFilters, PaginatedResponse, Comment, Review, ArticleDeta
 import type { ApiEnvelope, RawBlog, RawBlogListResponse, RawBlogDetailResponse, RawTag, RawComment, RawCommentListResponse, RawReview, RawReviewListResponse, RawViewsData, RawLikesData, RawBookmarksData, RawSharesData } from '@/src/types/api';
 import { BLOGS_PER_PAGE } from '@/src/constants';
 import { getVisitorId } from '@/src/utils/visitorId';
+import { resolveBlogImage } from '@/src/utils/blogImage';
 import apiClient from './apiClient';
 
 function analyticsHeaders() {
@@ -17,8 +18,8 @@ function mapBlog(raw: RawBlog): Blog {
     title:         raw.title,
     excerpt:       raw.excerpt ?? '',
     content:       raw.content ?? '',
-    thumbnail:     raw.thumbnail ?? '',
-    featuredImage: raw.featured_image ?? '',
+    thumbnail:     resolveBlogImage(raw.thumbnail, raw.id, raw.slug),
+    featuredImage: resolveBlogImage(raw.featured_image, raw.id, raw.slug),
     category: raw.category ? {
       id:    raw.category.id,
       name:  raw.category.name,
@@ -36,6 +37,7 @@ function mapBlog(raw: RawBlog): Blog {
       : [],
     author:      raw.author ?? { id: '', name: 'AI Insights Blogs', avatar: '', bio: '' },
     publishedAt: raw.published_at,
+    updatedAt:   raw.updated_at ?? raw.published_at,
     readTime:    raw.read_time ?? 5,
     views:       raw.views ?? 0,
     likes:       raw.likes ?? 0,

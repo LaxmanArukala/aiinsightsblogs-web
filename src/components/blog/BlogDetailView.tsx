@@ -22,6 +22,7 @@ import { blogService } from '@/src/services/blogService';
 import { formatDate, formatNumber } from '@/src/utils/formatters';
 import { useAppDispatch } from '@/src/redux/hooks';
 import { showSnackbar } from '@/src/redux/slices/uiSlice';
+import { SITE_NAME, SITE_URL } from '@/src/constants';
 import type { Blog } from '@/src/types';
 
 const CommentsSection = dynamic(() => import('@/src/components/comments/CommentsSection'), {
@@ -92,16 +93,40 @@ export default function BlogDetailView({ blog, otherArticles, relatedBlogs }: Bl
 
   if (!blog) return <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}><Navbar /><Container maxWidth="lg" sx={{ py: 12, textAlign: 'center' }}><Typography variant="h3" sx={{ fontWeight: 700 }} gutterBottom>Article Not Found</Typography><Button variant="contained" component={Link} href="/blogs">Browse All Articles</Button></Container><Footer /></Box>;
 
-  const jsonLd = {
+  const canonical = `${SITE_URL}/blogs/${blog.id}-${blog.slug}`;
+  const categoryUrl = `${SITE_URL}/blogs?category=${blog.category.slug}`;
+
+  const articleLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: blog.title,
     description: blog.excerpt,
-    image: blog.featuredImage,
+    image: blog.featuredImage.startsWith('http') ? blog.featuredImage : `${SITE_URL}${blog.featuredImage}`,
     datePublished: blog.publishedAt,
+    dateModified: blog.updatedAt || blog.publishedAt,
+    author: { '@type': 'Organization', name: blog.author?.name || SITE_NAME, url: SITE_URL },
     publisher: { '@type': 'Organization', name: 'AI Insights Blogs', url: 'https://aiinsightsblogs.com' },
-    mainEntityOfPage: { '@type': 'WebPage', '@id': `https://aiinsightsblogs.com/blogs/${blog.id}-${blog.slug}` },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
   };
+
+  /**
+   * Article URLs carry a UUID and a timestamp, which Google renders verbatim in the
+   * result. BreadcrumbList lets it show `AI Insights Blogs › Blogs › <category>`
+   * instead. The trail below must stay in step with the visible breadcrumb.
+   */
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'Blogs', item: `${SITE_URL}/blogs` },
+      { '@type': 'ListItem', position: 3, name: blog.category.name, item: categoryUrl },
+      // Final crumb is the current page, so per Google's spec it carries no `item`.
+      { '@type': 'ListItem', position: 4, name: blog.title },
+    ],
+  };
+
+  const jsonLd = [articleLd, breadcrumbLd];
 
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -109,7 +134,7 @@ export default function BlogDetailView({ blog, otherArticles, relatedBlogs }: Bl
       <Navbar />
       <Box sx={{ bgcolor: 'background.paper', borderBottom: 1, borderColor: 'divider' }}>
         <Container maxWidth="lg" sx={{ pt: 4, pb: 6 }}>
-          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} sx={{ mb: 4 }}><MuiLink component={Link} href="/" underline="hover" color="text.secondary">Home</MuiLink><MuiLink component={Link} href="/blogs" underline="hover" color="text.secondary">Blogs</MuiLink><Typography color="text.primary">{blog.title.slice(0, 30)}...</Typography></Breadcrumbs>
+          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} sx={{ mb: 4 }}><MuiLink component={Link} href="/" underline="hover" color="text.secondary">Home</MuiLink><MuiLink component={Link} href="/blogs" underline="hover" color="text.secondary">Blogs</MuiLink><MuiLink component={Link} href={`/blogs?category=${blog.category.slug}`} underline="hover" color="text.secondary">{blog.category.name}</MuiLink><Typography color="text.primary">{blog.title.length > 30 ? `${blog.title.slice(0, 30)}...` : blog.title}</Typography></Breadcrumbs>
           <Chip label={blog.category.name} size="small" component={Link} href={`/blogs?category=${blog.category.slug}`} clickable sx={{ bgcolor: blog.category.color, color: 'white', fontWeight: 700, mb: 2 }} />
           <Typography variant="h1" sx={{ fontWeight: 800, fontSize: { xs: '2rem', md: '3rem' }, lineHeight: 1.15, letterSpacing: '-0.03em', mb: 3 }}>{blog.title}</Typography>
           <Typography variant="h6" color="text.secondary" sx={{ lineHeight: 1.7, mb: 4 }}>{blog.excerpt}</Typography>

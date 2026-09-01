@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
-import { SITE_NAME, SITE_URL } from '@/src/constants';
+import { SITE_NAME, SITE_URL, API_BASE_URL } from '@/src/constants';
+import { absoluteBlogImage } from '@/src/utils/blogImage';
 
 export const dynamicParams = true;
 
 async function fetchAllBlogParams(): Promise<{ id: string; slug: string }[]> {
-  const base = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://api.aiinsightsblogs.com';
   try {
-    const first = await fetch(`${base}/api/v1/blogs?limit=100&page=1`);
+    const first = await fetch(`${API_BASE_URL}/api/v1/blogs?limit=100&page=1`);
     if (!first.ok) return [];
     const firstJson = await first.json();
     const totalPages: number = firstJson?.data?.meta?.total_pages ?? 1;
@@ -14,7 +14,7 @@ async function fetchAllBlogParams(): Promise<{ id: string; slug: string }[]> {
 
     const rest = await Promise.all(
       Array.from({ length: totalPages - 1 }, (_, i) =>
-        fetch(`${base}/api/v1/blogs?limit=100&page=${i + 2}`)
+        fetch(`${API_BASE_URL}/api/v1/blogs?limit=100&page=${i + 2}`)
           .then(r => r.json())
           .then(j => (j?.data?.data ?? []) as { id: string; slug: string }[])
           .catch(() => [] as { id: string; slug: string }[]),
@@ -49,8 +49,7 @@ interface RawBlog {
 
 async function fetchBlog(id: string): Promise<RawBlog | null> {
   try {
-    const base = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://api.aiinsightsblogs.com';
-    const res = await fetch(`${base}/api/v1/blogs/${id}`, { next: { revalidate: 3600 } });
+    const res = await fetch(`${API_BASE_URL}/api/v1/blogs/${id}`, { next: { revalidate: 3600 } });
     if (!res.ok) return null;
     const json = await res.json();
     return (json?.data ?? null) as RawBlog | null;
@@ -69,8 +68,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const url = `${SITE_URL}/blogs/${blog.id}-${blog.slug}`;
-  const DEFAULT_OG = 'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=1200&auto=format&fit=crop&q=80';
-  const image = blog.featured_image || blog.thumbnail || DEFAULT_OG;
+  const image = absoluteBlogImage(blog.featured_image || blog.thumbnail, blog.id, blog.slug);
   const keywords = (blog.tags ?? [])
     .map((t) => (typeof t === 'string' ? t : t.name))
     .filter((k): k is string => Boolean(k));

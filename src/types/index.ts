@@ -34,6 +34,7 @@ export interface Blog {
   tags: Tag[];
   author: Author;
   publishedAt: string;
+  updatedAt: string;
   readTime: number;
   views: number;
   likes: number;
