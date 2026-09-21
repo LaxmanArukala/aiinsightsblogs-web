@@ -61,7 +61,7 @@ async function fetchBlog(id: string): Promise<RawBlog | null> {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id: param } = await params;
   const uuid = param.substring(0, 36);
-  const blog = await fetchBlog(uuid);
+  const blog = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(uuid) ? await fetchBlog(uuid) : null;
 
   if (!blog) {
     return { title: 'Article Not Found', robots: { index: false, follow: false } };

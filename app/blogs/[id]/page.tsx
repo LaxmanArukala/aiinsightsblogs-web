@@ -5,6 +5,7 @@ import { blogService } from '@/src/services/blogService';
 import type { Blog } from '@/src/types';
 
 const UUID_LENGTH = 36;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export const revalidate = 3600;
 
@@ -19,6 +20,9 @@ export default async function BlogDetailPage({ params }: Props) {
   // A genuine miss must be a real 404 (not a 200 "not found" page, which Google
   // reports as a soft 404). Transient API errors are left to throw so they are
   // never cached or indexed as a missing article.
+  // The API answers 500 (not 404) for a malformed id, so reject those here.
+  if (!UUID_RE.test(id)) notFound();
+
   const detail = await blogService.getBlogById(id);
   if (!detail) notFound();
 
