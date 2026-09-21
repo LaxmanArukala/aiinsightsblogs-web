@@ -145,6 +145,8 @@ export const blogService = {
   async getBlogById(id: string): Promise<ArticleDetailResponse | null> {
     try {
       const { data: envelope } = await apiClient.get<ApiEnvelope<RawBlogDetailResponse>>(`/api/v1/blogs/${id}`);
+      // Articles awaiting approval (or rejected) must not be reachable by direct URL.
+      if (envelope.data.status && envelope.data.status !== 'published') return null;
       return {
         blog:    mapBlog(envelope.data),
         related: [],

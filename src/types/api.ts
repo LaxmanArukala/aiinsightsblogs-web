@@ -50,6 +50,8 @@ export interface RawTag {
 
 export interface RawBlog {
   id: string;
+  /** Absent on older payloads; anything other than 'published' must not be shown. */
+  status?: string;
   slug: string;
   title: string;
   excerpt: string;
