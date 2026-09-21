@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import BlogsListView from '@/src/components/blogs/BlogsListView';
 import { blogService } from '@/src/services/blogService';
+import { categoryService } from '@/src/services/categoryService';
 import { SORT_OPTIONS } from '@/src/constants';
 import type { SortOption } from '@/src/types';
 
@@ -34,13 +35,14 @@ export default async function BlogsPage({ searchParams }: BlogsPageProps) {
   // and trigger its "column undefined" failure.
   const sort: SortOption = (SORT_OPTIONS.find((o) => o.value === sp.sort)?.value ?? 'latest') as SortOption;
 
-  const initialData = await blogService
-    .getBlogs({ search, category, sort, page })
-    .catch(() => undefined);
+  const [initialData, initialCategories] = await Promise.all([
+    blogService.getBlogs({ search, category, sort, page }).catch(() => undefined),
+    categoryService.getCategories(),
+  ]);
 
   return (
     <Suspense>
-      <BlogsListView initialData={initialData} initialFilters={{ search, category, page, sort }} />
+      <BlogsListView initialData={initialData} initialCategories={initialCategories} initialFilters={{ search, category, page, sort }} />
     </Suspense>
   );
 }

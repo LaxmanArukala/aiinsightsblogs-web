@@ -18,8 +18,9 @@ import { formatDate } from '@/src/utils/formatters';
 import { useAppDispatch, useAppSelector } from '@/src/redux/hooks';
 import { toggleBookmark } from '@/src/redux/slices/blogSlice';
 import AdSlot from '@/src/components/common/AdSlot';
+import { categoryService } from '@/src/services/categoryService';
 import { BLOG_CATEGORIES, ADSENSE_SLOT_SIDEBAR, SORT_OPTIONS } from '@/src/constants';
-import type { PaginatedResponse, Blog, SortOption } from '@/src/types';
+import type { PaginatedResponse, Blog, Category, SortOption } from '@/src/types';
 
 /**
  * Horizontal article rows beside a sidebar of picks.
@@ -34,6 +35,7 @@ import type { PaginatedResponse, Blog, SortOption } from '@/src/types';
 interface BlogsListViewProps {
   initialData?: PaginatedResponse<Blog>;
   /** The filters the server actually fetched `initialData` for. */
+  initialCategories?: Category[];
   initialFilters: { search: string; category: string; page: number; sort: SortOption };
 }
 
@@ -183,7 +185,7 @@ function RowSkeleton() {
   );
 }
 
-export default function BlogsListView({ initialData, initialFilters }: BlogsListViewProps) {
+export default function BlogsListView({ initialData, initialCategories, initialFilters }: BlogsListViewProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isDark = useTheme().palette.mode === 'dark';
@@ -230,7 +232,18 @@ export default function BlogsListView({ initialData, initialFilters }: BlogsList
     placeholderData: keepPreviousData,
   });
 
-  const activeCategory = BLOG_CATEGORIES.find((c) => c.slug === category);
+  // Tabs come from the categories API (sorted by name); the static list is only a
+  // fallback if the API is unreachable or returns nothing.
+  const { data: apiCategories } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => categoryService.getCategories(),
+    initialData: initialCategories?.length ? initialCategories : undefined,
+    staleTime: 5 * 60 * 1000,
+  });
+  const categories: ReadonlyArray<{ slug: string; name: string; color?: string }> =
+    apiCategories?.length ? apiCategories : BLOG_CATEGORIES;
+
+  const activeCategory = categories.find((c) => c.slug === category);
   const hasFilters = Boolean(category || urlSearch);
   const clearAll = () => { setSearch(''); setParams({ search: undefined, category: undefined, page: undefined, sort: undefined }); };
 
@@ -348,7 +361,7 @@ export default function BlogsListView({ initialData, initialFilters }: BlogsList
             '&::-webkit-scrollbar': { display: 'none' },
           }}
         >
-          {[{ slug: '', name: 'All' }, ...BLOG_CATEGORIES].map((c) => {
+          {[{ slug: '', name: 'All' }, ...categories].map((c) => {
             const active = c.slug === category;
             return (
               <Box

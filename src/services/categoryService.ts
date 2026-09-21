@@ -6,7 +6,8 @@ function mapCategory(raw: RawCategoryFull): Category {
   return {
     id:    raw.id,
     name:  raw.name,
-    slug:  raw.slug,
+    // The API returns no slug; derive it the same way blogService does for blog.category.
+    slug:  raw.slug ?? raw.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
     color: raw.color || '#0ea5e9',
     count: raw.blog_count,
   };
@@ -20,7 +21,9 @@ export const categoryService = {
         { params: { limit: 100 } },
       );
       if (!envelope.data?.data) return [];
-      return envelope.data.data.map(mapCategory);
+      return envelope.data.data
+        .map(mapCategory)
+        .sort((a, b) => a.name.localeCompare(b.name));
     } catch {
       return [];
     }
