@@ -150,7 +150,7 @@ export const blogService = {
         related: [],
       };
     } catch (err) {
-      if (axios.isAxiosError(err) && err.response?.status === 404) return null;
+      if (axios.isAxiosError(err) && (err.response?.status === 404 || err.response?.status === 400)) return null;
       throw err;
     }
   },

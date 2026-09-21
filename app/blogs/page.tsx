@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import type { Metadata } from 'next';
 import BlogsListView from '@/src/components/blogs/BlogsListView';
 import { blogService } from '@/src/services/blogService';
 import { SORT_OPTIONS } from '@/src/constants';
@@ -14,6 +15,14 @@ import type { SortOption } from '@/src/types';
  */
 interface BlogsPageProps {
   searchParams: Promise<{ category?: string; search?: string; page?: string; sort?: string }>;
+}
+
+// Filtered/paginated/sorted views are duplicates of /blogs for search purposes;
+// keep them crawlable (so article links are followed) but out of the index.
+export async function generateMetadata({ searchParams }: BlogsPageProps): Promise<Metadata> {
+  const sp = await searchParams;
+  const filtered = Boolean(sp.category || sp.search || sp.page || sp.sort);
+  return filtered ? { robots: { index: false, follow: true } } : {};
 }
 
 export default async function BlogsPage({ searchParams }: BlogsPageProps) {

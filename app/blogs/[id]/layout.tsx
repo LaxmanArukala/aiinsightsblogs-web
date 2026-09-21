@@ -64,7 +64,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const blog = await fetchBlog(uuid);
 
   if (!blog) {
-    return { title: 'Article Not Found' };
+    return { title: 'Article Not Found', robots: { index: false, follow: false } };
   }
 
   const url = `${SITE_URL}/blogs/${blog.id}-${blog.slug}`;

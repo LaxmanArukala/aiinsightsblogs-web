@@ -1,4 +1,5 @@
 import { preload } from 'react-dom';
+import { notFound, permanentRedirect } from 'next/navigation';
 import BlogDetailView from '@/src/components/blog/BlogDetailView';
 import { blogService } from '@/src/services/blogService';
 import type { Blog } from '@/src/types';
@@ -15,10 +16,17 @@ export default async function BlogDetailPage({ params }: Props) {
   const { id: param } = await params;
   const id = param.substring(0, UUID_LENGTH);
 
-  const detail = await blogService.getBlogById(id).catch(() => null);
-  if (!detail) return <BlogDetailView blog={null} otherArticles={[]} relatedBlogs={[]} />;
+  // A genuine miss must be a real 404 (not a 200 "not found" page, which Google
+  // reports as a soft 404). Transient API errors are left to throw so they are
+  // never cached or indexed as a missing article.
+  const detail = await blogService.getBlogById(id);
+  if (!detail) notFound();
 
   const blog = detail.blog;
+
+  // One article, one URL: bare-UUID and wrong-slug requests redirect to the
+  // canonical `id-slug` form instead of serving duplicate 200 pages.
+  if (param !== `${blog.id}-${blog.slug}`) permanentRedirect(`/blogs/${blog.id}-${blog.slug}`);
 
   if (blog.featuredImage) {
     preload(blog.featuredImage, { as: 'image', fetchPriority: 'high' });
