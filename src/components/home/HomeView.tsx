@@ -10,6 +10,7 @@ import LatestArticles from '@/src/components/home/LatestArticles';
 import TestimonialsSection from '@/src/components/home/TestimonialsSection';
 import NewsletterSection from '@/src/components/home/NewsletterSection';
 import AboutSection from '@/src/components/home/AboutSection';
+import ServicesSection from '@/src/components/home/ServicesSection';
 import type { Blog, Testimonial } from '@/src/types';
 
 interface HomeViewProps {
@@ -31,6 +32,9 @@ export default function HomeView({ featured, latest, testimonials, articleCount 
         <FeaturedBlogs blogs={featured} />
         <LatestArticles blogs={latest} articleCount={articleCount} />
         <AboutSection articleCount={articleCount} />
+        {/* Offer comes after the archive and the About copy, so search visitors
+            meet the content and the people before the pitch. */}
+        <ServicesSection />
         {testimonials.length > 0 && <TestimonialsSection testimonials={testimonials} />}
         <NewsletterSection />
       </Box>
