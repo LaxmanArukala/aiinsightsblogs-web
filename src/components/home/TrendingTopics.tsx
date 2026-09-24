@@ -2,7 +2,7 @@
 
 import { Box, Container, Typography, useTheme } from '@mui/material';
 import Link from 'next/link';
-import { AI_TOPICS } from '@/src/constants';
+import type { Topic } from '@/src/utils/categories';
 
 /**
  * Topics arranged around a hexagon — one vertex per topic.
@@ -40,9 +40,14 @@ function pointAt(index: number, radius: number, total: number) {
   };
 }
 
-const TOTAL = AI_TOPICS.length;
-
-const NODES = AI_TOPICS.map((topic, i) => {
+/**
+ * Geometry is derived per render because the topic list now comes from the API:
+ * the polygon has as many vertices as there are categories, so it cannot be
+ * precomputed at module scope any more.
+ */
+function buildNodes(topics: Topic[]) {
+  const TOTAL = topics.length;
+  return topics.map((topic, i) => {
   const vertex = pointAt(i, VERTEX_R, TOTAL);
   const label = pointAt(i, LABEL_R, TOTAL);
   const dx = label.x - CX;
@@ -56,12 +61,14 @@ const NODES = AI_TOPICS.map((topic, i) => {
     align: side === 'center' ? 'center' : side === 'left' ? 'left' : 'right',
     transform:
       side === 'center' ? 'translate(-50%, -50%)' : side === 'left' ? 'translate(0, -50%)' : 'translate(-100%, -50%)',
-  };
-});
+    };
+  });
+}
 
-const POLYGON_POINTS = NODES.map((n) => `${n.vertex.x},${n.vertex.y}`).join(' ');
+export default function TrendingTopics({ topics }: { readonly topics: Topic[] }) {
+  const NODES = buildNodes(topics);
+  const POLYGON_POINTS = NODES.map((n) => `${n.vertex.x},${n.vertex.y}`).join(' ');
 
-export default function TrendingTopics() {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
 

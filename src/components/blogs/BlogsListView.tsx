@@ -19,7 +19,7 @@ import { useAppDispatch, useAppSelector } from '@/src/redux/hooks';
 import { toggleBookmark } from '@/src/redux/slices/blogSlice';
 import AdSlot from '@/src/components/common/AdSlot';
 import { categoryService } from '@/src/services/categoryService';
-import { BLOG_CATEGORIES, ADSENSE_SLOT_SIDEBAR, SORT_OPTIONS } from '@/src/constants';
+import { ADSENSE_SLOT_SIDEBAR, SORT_OPTIONS } from '@/src/constants';
 import type { PaginatedResponse, Blog, Category, SortOption } from '@/src/types';
 
 /**
@@ -240,8 +240,10 @@ export default function BlogsListView({ initialData, initialCategories, initialF
     initialData: initialCategories?.length ? initialCategories : undefined,
     staleTime: 5 * 60 * 1000,
   });
-  const categories: ReadonlyArray<{ slug: string; name: string; color?: string }> =
-    apiCategories?.length ? apiCategories : BLOG_CATEGORIES;
+  // No hardcoded fallback: the previous one listed a "Data Science" category the
+  // API does not have, and omitted two it does. If the API is unreachable the
+  // archive itself will not load either, so an "All" tab alone is the honest state.
+  const categories: ReadonlyArray<{ slug: string; name: string; color?: string }> = apiCategories ?? [];
 
   const activeCategory = categories.find((c) => c.slug === category);
   const hasFilters = Boolean(category || urlSearch);

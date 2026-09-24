@@ -1,13 +1,14 @@
 import type { Category } from '@/src/types';
 import type { ApiEnvelope, RawCategoryFull, RawCategoryListResponse } from '@/src/types/api';
 import apiClient from './apiClient';
+import { slugifyCategory } from '@/src/utils/categories';
 
 function mapCategory(raw: RawCategoryFull): Category {
   return {
     id:    raw.id,
     name:  raw.name,
-    // The API returns no slug; derive it the same way blogService does for blog.category.
-    slug:  raw.slug ?? raw.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+    // The API returns no slug; derive it the same way the backend resolves a filter.
+    slug:  raw.slug ?? slugifyCategory(raw.name),
     color: raw.color || '#0ea5e9',
     count: raw.blog_count,
   };

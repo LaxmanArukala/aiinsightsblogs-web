@@ -8,18 +8,32 @@ import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import Link from 'next/link';
 import { SITE_NAME, SITE_DESCRIPTION } from '@/src/constants';
+import { useCategories } from '@/src/components/providers/CategoriesProvider';
 import { useAppDispatch } from '@/src/redux/hooks';
 import { showSnackbar } from '@/src/redux/slices/uiSlice';
 import apiClient from '@/src/services/apiClient';
 
-const footerLinks: Record<string, { label: string; href: string }[]> = {
+const STATIC_LINKS: Record<string, { label: string; href: string }[]> = {
   Platform: [{ label: 'Home', href: '/' }, { label: 'Blogs', href: '/blogs' }, { label: 'About Us', href: '/about' }, { label: 'Contact', href: '/contact' }],
-  Categories: [{ label: 'AI Agents', href: '/blogs?category=ai-agents' }, { label: 'LLMs', href: '/blogs?category=llms' }, { label: 'Generative AI', href: '/blogs?category=generative-ai' }],
   Legal: [{ label: 'About', href: '/about' }, { label: 'Privacy Policy', href: '/privacy-policy' }, { label: 'Terms & Conditions', href: '/terms-and-conditions' }],
 };
 
+/** Categories column was three hardcoded links; it now follows the API. */
+const CATEGORY_COLUMN_LIMIT = 6;
+
 export default function Footer() {
   const dispatch = useAppDispatch();
+
+  const categoryLinks = useCategories()
+    .slice(0, CATEGORY_COLUMN_LIMIT)
+    .map((c) => ({ label: c.name, href: `/blogs?category=${c.slug}` }));
+
+  // Keep the column order stable whether or not the fetch has landed.
+  const footerLinks: Record<string, { label: string; href: string }[]> = {
+    Platform: STATIC_LINKS.Platform,
+    ...(categoryLinks.length > 0 ? { Categories: categoryLinks } : {}),
+    Legal: STATIC_LINKS.Legal,
+  };
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);

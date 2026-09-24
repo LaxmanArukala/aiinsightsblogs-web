@@ -12,26 +12,28 @@ import NewsletterSection from '@/src/components/home/NewsletterSection';
 import AboutSection from '@/src/components/home/AboutSection';
 import ServicesSection from '@/src/components/home/ServicesSection';
 import type { Blog, Testimonial } from '@/src/types';
+import type { Topic } from '@/src/utils/categories';
 
 interface HomeViewProps {
   featured: Blog[];
   latest: Blog[];
   testimonials: Testimonial[];
   articleCount: number;
+  topics: Topic[];
 }
 
-export default function HomeView({ featured, latest, testimonials, articleCount }: HomeViewProps) {
+export default function HomeView({ featured, latest, testimonials, articleCount, topics }: HomeViewProps) {
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
       <Box component="main" sx={{ flexGrow: 1 }}>
-        <HeroSection articleCount={articleCount} />
+        <HeroSection articleCount={articleCount} topics={topics} />
         {/* Articles lead: a reader arriving from search should hit real content
             before an About essay, so AboutSection now sits below the archive. */}
-        <TrendingTopics />
+        <TrendingTopics topics={topics} />
         <FeaturedBlogs blogs={featured} />
         <LatestArticles blogs={latest} articleCount={articleCount} />
-        <AboutSection articleCount={articleCount} />
+        <AboutSection articleCount={articleCount} topicCount={topics.length} />
         {/* Offer comes after the archive and the About copy, so search visitors
             meet the content and the people before the pitch. */}
         <ServicesSection />

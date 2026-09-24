@@ -3,6 +3,8 @@ import { Inter } from 'next/font/google';
 import Script from 'next/script';
 import './globals.css';
 import AppProviders from '@/src/components/providers/AppProviders';
+import { categoryService } from '@/src/services/categoryService';
+import { toTopics } from '@/src/utils/categories';
 import GlobalSnackbar from '@/src/components/common/GlobalSnackbar';
 import { SITE_NAME, SITE_DESCRIPTION, SITE_URL, GA_MEASUREMENT_ID, GTM_CONTAINER_ID, ADSENSE_ID, BING_SITE_VERIFICATION } from '@/src/constants';
 
@@ -42,7 +44,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  // Fetched here so every page's Footer renders its category links server-side.
+  const topics = toTopics(await categoryService.getCategories());
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -102,7 +107,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             />
           </noscript>
         )}
-        <AppProviders>
+        <AppProviders topics={topics}>
           {children}
           <GlobalSnackbar />
         </AppProviders>

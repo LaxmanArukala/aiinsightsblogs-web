@@ -5,6 +5,7 @@ import { BLOGS_PER_PAGE } from '@/src/constants';
 import { getVisitorId } from '@/src/utils/visitorId';
 import { resolveBlogImage } from '@/src/utils/blogImage';
 import apiClient from './apiClient';
+import { slugifyCategory } from '@/src/utils/categories';
 
 function analyticsHeaders() {
   const id = getVisitorId();
@@ -51,7 +52,7 @@ function mapBlog(raw: RawBlog): Blog {
     category: raw.category ? {
       id:    raw.category.id,
       name:  raw.category.name,
-      slug:  raw.category.slug ?? raw.category.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+      slug:  raw.category.slug ?? slugifyCategory(raw.category.name),
       color: raw.category.color ?? '#0ea5e9',
     } : { id: '', name: 'General', slug: 'general', color: '#0ea5e9' },
     tags:        mapTags(raw.tags),

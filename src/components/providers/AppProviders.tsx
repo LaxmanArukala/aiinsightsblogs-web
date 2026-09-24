@@ -7,6 +7,8 @@ import { ThemeProvider, CssBaseline } from '@mui/material';
 import { store } from '@/src/redux/store';
 import { useAppSelector } from '@/src/redux/hooks';
 import getTheme from '@/src/themes';
+import { CategoriesProvider } from '@/src/components/providers/CategoriesProvider';
+import type { Topic } from '@/src/utils/categories';
 
 function MuiThemeProvider({ children }: { children: ReactNode }) {
   const themeMode = useAppSelector(s => s.ui.themeMode);
@@ -14,12 +16,14 @@ function MuiThemeProvider({ children }: { children: ReactNode }) {
   return <ThemeProvider theme={theme}><CssBaseline />{children}</ThemeProvider>;
 }
 
-export default function AppProviders({ children }: { children: ReactNode }) {
+export default function AppProviders({ children, topics = [] }: { children: ReactNode; topics?: Topic[] }) {
   const [queryClient] = useState(() => new QueryClient({ defaultOptions: { queries: { staleTime: 60 * 1000 } } }));
   return (
     <ReduxProvider store={store}>
       <QueryClientProvider client={queryClient}>
-        <MuiThemeProvider>{children}</MuiThemeProvider>
+        <CategoriesProvider topics={topics}>
+          <MuiThemeProvider>{children}</MuiThemeProvider>
+        </CategoriesProvider>
       </QueryClientProvider>
     </ReduxProvider>
   );

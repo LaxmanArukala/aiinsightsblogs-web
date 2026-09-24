@@ -7,7 +7,8 @@ import type { ReactNode } from 'react';
 import Navbar from '@/src/components/layout/Navbar';
 import Footer from '@/src/components/layout/Footer';
 import { FigureHero, FigureCoverage, FigurePipeline, FigureLibrary } from '@/src/components/about/AboutIllustrations';
-import { SITE_NAME, BLOG_CATEGORIES, AI_TOPICS } from '@/src/constants';
+import { SITE_NAME } from '@/src/constants';
+import type { Topic } from '@/src/utils/categories';
 
 /**
  * Editorial collage layout: each section pairs copy with an illustration that sits
@@ -19,6 +20,8 @@ import { SITE_NAME, BLOG_CATEGORIES, AI_TOPICS } from '@/src/constants';
 
 interface AboutViewProps {
   articleCount: number;
+  /** Categories from the API — the count and both topic lists derive from it. */
+  topics: Topic[];
 }
 
 const DIFFERENTIATORS = [
@@ -97,7 +100,7 @@ function Section({
   );
 }
 
-export default function AboutView({ articleCount }: AboutViewProps) {
+export default function AboutView({ articleCount, topics }: AboutViewProps) {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
 
@@ -111,7 +114,7 @@ export default function AboutView({ articleCount }: AboutViewProps) {
 
   const stats = [
     { value: articleCount.toLocaleString('en-US'), label: 'Articles published' },
-    { value: `${BLOG_CATEGORIES.length}`, label: 'Topics covered' },
+    { value: `${topics.length}`, label: 'Topics covered' },
     { value: '100%', label: 'Free to read' },
   ];
 
@@ -199,7 +202,7 @@ export default function AboutView({ articleCount }: AboutViewProps) {
               </Typography>
               <Typography sx={{ color: 'text.secondary', lineHeight: 1.9 }}>
                 Articles here aim to be specific enough to act on — a working pattern, a mental
-                model, or a decision you can defend — across {BLOG_CATEGORIES.length} topics from
+                model, or a decision you can defend — across {topics.length} topics from
                 agents and language models to computer vision and robotics.
               </Typography>
             </Grid>
@@ -217,7 +220,7 @@ export default function AboutView({ articleCount }: AboutViewProps) {
             Six threads run through the archive. Each links straight into its articles.
           </Typography>
           <Grid container spacing={3}>
-            {AI_TOPICS.map((topic) => (
+            {topics.map((topic) => (
               <Grid size={{ xs: 12, sm: 6, md: 4 }} key={topic.id}>
                 <Box
                   component={Link}
@@ -347,7 +350,7 @@ export default function AboutView({ articleCount }: AboutViewProps) {
               </Typography>
 
               <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 1, mb: 4 }}>
-                {BLOG_CATEGORIES.map((c) => (
+                {topics.map((c) => (
                   <Box
                     key={c.slug}
                     component={Link}

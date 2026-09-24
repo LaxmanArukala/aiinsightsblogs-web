@@ -8,18 +8,19 @@ import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import Link from 'next/link';
 import AboutIllustration from '@/src/components/home/AboutIllustration';
-import { AI_TOPICS } from '@/src/constants';
+
 
 interface AboutSectionProps {
   articleCount: number;
+  topicCount: number;
 }
 
-export default function AboutSection({ articleCount }: AboutSectionProps) {
+export default function AboutSection({ articleCount, topicCount }: AboutSectionProps) {
   // Counts come from the API rather than being written into the copy: the previous
   // hardcoded figures had drifted far from reality and contradicted each other.
   const highlights = [
     { icon: <ArticleOutlinedIcon fontSize="small" />, label: `${articleCount.toLocaleString('en-US')} articles` },
-    { icon: <CategoryOutlinedIcon fontSize="small" />, label: `${AI_TOPICS.length} AI topics` },
+    { icon: <CategoryOutlinedIcon fontSize="small" />, label: `${topicCount} AI topics` },
     { icon: <LockOpenOutlinedIcon fontSize="small" />, label: 'Free to read' },
   ];
 

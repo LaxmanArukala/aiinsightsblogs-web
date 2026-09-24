@@ -8,21 +8,19 @@ import ArticleIcon from '@mui/icons-material/Article';
 import SearchIcon from '@mui/icons-material/Search';
 import Navbar from '@/src/components/layout/Navbar';
 import Footer from '@/src/components/layout/Footer';
-import { SITE_NAME, BLOG_CATEGORIES } from '@/src/constants';
+import { SITE_NAME } from '@/src/constants';
+import { useCategories } from '@/src/components/providers/CategoriesProvider';
 
 /**
- * Derived from BLOG_CATEGORIES so the slugs stay valid.
- *
- * These were previously hardcoded display names ('?category=AI Agents'). The API
- * filters by slug only and returns zero results for a name, so all four recovery
- * links on this 404 page led to an empty list.
+ * Recovery links come from the categories API, so a renamed or added category
+ * never leaves a dead link here. Shown only once loaded — a 404 page with no
+ * chips is better than one with chips that lead nowhere.
  */
-const QUICK_LINKS = BLOG_CATEGORIES.slice(0, 4).map((c) => ({
-  label: c.name,
-  href: `/blogs?category=${c.slug}`,
-}));
-
 export default function NotFound() {
+  const quickLinks = useCategories().slice(0, 4).map((c) => ({
+    label: c.name,
+    href: `/blogs?category=${c.slug}`,
+  }));
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
@@ -153,7 +151,7 @@ export default function NotFound() {
               Popular topics
             </Typography>
             <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 1.5, justifyContent: 'center' }}>
-              {QUICK_LINKS.map(link => (
+              {quickLinks.map(link => (
                 <Chip
                   key={link.label}
                   label={link.label}

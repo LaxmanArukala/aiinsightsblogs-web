@@ -4,14 +4,16 @@ import { Box, Container, Typography, Button, Stack, useTheme } from '@mui/materi
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import Link from 'next/link';
 import AuroraBackground from '@/src/components/home/AuroraBackground';
-import { AI_TOPICS } from '@/src/constants';
+import type { Topic } from '@/src/utils/categories';
 
 interface HeroSectionProps {
   /** Live total from the API — never hardcode it, the archive grows daily. */
   articleCount: number;
+  /** Categories from the API; the count and the pills both come from this. */
+  topics: Topic[];
 }
 
-export default function HeroSection({ articleCount }: HeroSectionProps) {
+export default function HeroSection({ articleCount, topics }: HeroSectionProps) {
   const isDark = useTheme().palette.mode === 'dark';
 
   const ink = isDark ? '#ffffff' : '#0b1220';
@@ -20,7 +22,7 @@ export default function HeroSection({ articleCount }: HeroSectionProps) {
 
   const stats = [
     { value: articleCount > 0 ? `${articleCount.toLocaleString('en-US')}` : '—', label: 'Articles' },
-    { value: `${AI_TOPICS.length}`, label: 'Topics' },
+    { value: `${topics.length}`, label: 'Topics' },
     { value: 'Free', label: 'Always' },
   ];
 
@@ -191,7 +193,7 @@ export default function HeroSection({ articleCount }: HeroSectionProps) {
           spacing={1}
           sx={{ justifyContent: 'center', flexWrap: 'wrap', gap: 1, mb: 6, animation: 'heroRise 0.7s cubic-bezier(0.22,1,0.36,1) 0.32s both' }}
         >
-          {AI_TOPICS.map((topic) => (
+          {topics.map((topic) => (
             <Box
               key={topic.id}
               component={Link}

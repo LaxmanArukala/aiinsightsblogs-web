@@ -1,15 +1,19 @@
 import HomeView from '@/src/components/home/HomeView';
 import { blogService } from '@/src/services/blogService';
 import { testimonialService } from '@/src/services/testimonialService';
+import { categoryService } from '@/src/services/categoryService';
+import { toTopics } from '@/src/utils/categories';
 
 export const revalidate = 3600;
 
 export default async function HomePage() {
-  const [featured, all, testimonials] = await Promise.all([
+  const [featured, all, testimonials, categories] = await Promise.all([
     blogService.getFeaturedBlogs().catch(() => []),
     blogService.getBlogs({ sort: 'latest' }).catch(() => ({ data: [], total: 0, page: 1, pageSize: 12, totalPages: 0 })),
     testimonialService.getTestimonials().catch(() => []),
+    categoryService.getCategories(),
   ]);
+  const topics = toTopics(categories);
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -23,7 +27,7 @@ export default async function HomePage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <HomeView featured={featured} latest={all.data} testimonials={testimonials} articleCount={all.total} />
+      <HomeView featured={featured} latest={all.data} testimonials={testimonials} articleCount={all.total} topics={topics} />
     </>
   );
 }
