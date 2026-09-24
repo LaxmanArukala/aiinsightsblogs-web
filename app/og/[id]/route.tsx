@@ -163,6 +163,18 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
       height: HEIGHT,
       headers: {
         'Cache-Control': 'public, max-age=31536000, s-maxage=31536000, immutable',
+        /*
+         * Every article's og:image points here, so Google discovers one of these per
+         * post and files it under "Crawled - currently not indexed" — 267 of them,
+         * because a social preview image is not a page and never will be indexed as
+         * one. Declaring noindex moves them to a deliberate "excluded" state and
+         * stops the repeated recrawls.
+         *
+         * A robots.txt Disallow would be wrong here: crawlers have to fetch the URL
+         * to see this header, and social networks need it reachable to render the
+         * preview card.
+         */
+        'X-Robots-Tag': 'noindex',
       },
     },
   );
