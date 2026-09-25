@@ -22,7 +22,8 @@ import { blogService } from '@/src/services/blogService';
 import { formatDate, formatNumber } from '@/src/utils/formatters';
 import { useAppDispatch } from '@/src/redux/hooks';
 import { showSnackbar } from '@/src/redux/slices/uiSlice';
-import { SITE_NAME, SITE_URL } from '@/src/constants';
+import AdSlot from '@/src/components/common/AdSlot';
+import { SITE_NAME, SITE_URL, ADSENSE_SLOT_ARTICLE } from '@/src/constants';
 import type { Blog } from '@/src/types';
 
 const CommentsSection = dynamic(() => import('@/src/components/comments/CommentsSection'), {
@@ -281,6 +282,10 @@ export default function BlogDetailView({ blog, otherArticles, relatedBlogs }: Bl
                     </Stack>
                   </Paper>
                 )}
+
+                {/* Sits below the widgets: the sidebar is sticky, so the unit stays
+                    in view down the article without interrupting the reading column. */}
+                <AdSlot slot={ADSENSE_SLOT_ARTICLE} minHeight={600} format="vertical" />
               </Stack>
             </Grid>
           </Grid>

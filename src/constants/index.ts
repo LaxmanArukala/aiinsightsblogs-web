@@ -18,6 +18,12 @@ export const BING_SITE_VERIFICATION = process.env.NEXT_PUBLIC_BING_SITE_VERIFICA
 
 /** AdSense ad-unit ids. Empty means the placement renders nothing in production. */
 export const ADSENSE_SLOT_SIDEBAR = process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR ?? '';
+/**
+ * Article-page sidebar unit. Falls back to the listing slot so one ad unit is
+ * enough to start earning; set it separately to report on the two placements apart.
+ */
+export const ADSENSE_SLOT_ARTICLE =
+  process.env.NEXT_PUBLIC_ADSENSE_SLOT_ARTICLE || process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR || '';
 
 export const SITE_NAME = 'AI Insights Blogs';
 export const SITE_DESCRIPTION = 'Your premier destination for deep-dive articles on AI Agents, Large Language Models, and Generative AI. Stay ahead with expert insights, tutorials, and analysis.';
