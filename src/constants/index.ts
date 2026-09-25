@@ -25,6 +25,9 @@ export const ADSENSE_SLOT_SIDEBAR = process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR
 export const ADSENSE_SLOT_ARTICLE =
   process.env.NEXT_PUBLIC_ADSENSE_SLOT_ARTICLE || process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR || '';
 
+/** Horizontal unit above the article title. */
+export const ADSENSE_SLOT_ARTICLE_TOP = process.env.NEXT_PUBLIC_ADSENSE_SLOT_ARTICLE_TOP ?? '';
+
 export const SITE_NAME = 'AI Insights Blogs';
 export const SITE_DESCRIPTION = 'Your premier destination for deep-dive articles on AI Agents, Large Language Models, and Generative AI. Stay ahead with expert insights, tutorials, and analysis.';
 export const SITE_URL = 'https://aiinsightsblogs.com';

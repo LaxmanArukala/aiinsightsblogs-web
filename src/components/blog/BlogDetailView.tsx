@@ -23,7 +23,7 @@ import { formatDate, formatNumber } from '@/src/utils/formatters';
 import { useAppDispatch } from '@/src/redux/hooks';
 import { showSnackbar } from '@/src/redux/slices/uiSlice';
 import AdSlot from '@/src/components/common/AdSlot';
-import { SITE_NAME, SITE_URL, ADSENSE_SLOT_ARTICLE } from '@/src/constants';
+import { SITE_NAME, SITE_URL, ADSENSE_SLOT_ARTICLE, ADSENSE_SLOT_ARTICLE_TOP } from '@/src/constants';
 import type { Blog } from '@/src/types';
 
 const CommentsSection = dynamic(() => import('@/src/components/comments/CommentsSection'), {
@@ -136,6 +136,9 @@ export default function BlogDetailView({ blog, otherArticles, relatedBlogs }: Bl
       <Box sx={{ bgcolor: 'background.paper', borderBottom: 1, borderColor: 'divider' }}>
         <Container maxWidth="lg" sx={{ pt: 4, pb: 6 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} sx={{ mb: 4 }}><MuiLink component={Link} href="/" underline="hover" color="text.secondary">Home</MuiLink><MuiLink component={Link} href="/blogs" underline="hover" color="text.secondary">Blogs</MuiLink><MuiLink component={Link} href={`/blogs?category=${blog.category.slug}`} underline="hover" color="text.secondary">{blog.category.name}</MuiLink><Typography color="text.primary">{blog.title.length > 30 ? `${blog.title.slice(0, 30)}...` : blog.title}</Typography></Breadcrumbs>
+          {/* Leaderboard above the headline. minHeight reserves the space before the
+              unit fills, so the title does not jump once the ad loads. */}
+          <AdSlot slot={ADSENSE_SLOT_ARTICLE_TOP} minHeight={100} format="auto" />
           <Chip label={blog.category.name} size="small" component={Link} href={`/blogs?category=${blog.category.slug}`} clickable sx={{ bgcolor: blog.category.color, color: 'white', fontWeight: 700, mb: 2 }} />
           <Typography variant="h1" sx={{ fontWeight: 800, fontSize: { xs: '2rem', md: '3rem' }, lineHeight: 1.15, letterSpacing: '-0.03em', mb: 3 }}>{blog.title}</Typography>
           <Typography variant="h6" color="text.secondary" sx={{ lineHeight: 1.7, mb: 4 }}>{blog.excerpt}</Typography>
