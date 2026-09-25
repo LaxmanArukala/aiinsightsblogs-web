@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { SITE_URL, API_BASE_URL } from '@/src/constants';
+import { MERGED_IDS } from '@/src/utils/merged';
 
 export const revalidate = 3600;
 
@@ -45,7 +46,8 @@ async function fetchAllBlogs(): Promise<RawBlog[]> {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const blogs = await fetchAllBlogs();
+  // A merged duplicate only 301s now, so listing it would advertise a redirect.
+  const blogs = (await fetchAllBlogs()).filter((b) => !MERGED_IDS.has(b.id));
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: SITE_URL, lastModified: new Date(), changeFrequency: 'daily', priority: 1 },

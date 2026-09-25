@@ -2,6 +2,7 @@ import { preload } from 'react-dom';
 import { notFound, permanentRedirect } from 'next/navigation';
 import BlogDetailView from '@/src/components/blog/BlogDetailView';
 import { blogService } from '@/src/services/blogService';
+import { mergedTarget } from '@/src/utils/merged';
 import type { Blog } from '@/src/types';
 
 const UUID_LENGTH = 36;
@@ -22,6 +23,14 @@ export default async function BlogDetailPage({ params }: Props) {
   // never cached or indexed as a missing article.
   // The API answers 500 (not 404) for a malformed id, so reject those here.
   if (!UUID_RE.test(id)) notFound();
+
+  /*
+   * Merged duplicates redirect before the article is fetched, so the URL keeps
+   * working after the copy is withdrawn from the archive — and the redirect is
+   * what hands its ranking signals to the copy that was kept.
+   */
+  const merged = mergedTarget(id);
+  if (merged) permanentRedirect(merged);
 
   const detail = await blogService.getBlogById(id);
   if (!detail) notFound();

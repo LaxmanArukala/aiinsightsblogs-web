@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { SITE_NAME, SITE_URL, API_BASE_URL } from '@/src/constants';
+import { MERGED_IDS } from '@/src/utils/merged';
 import { absoluteBlogImage } from '@/src/utils/blogImage';
 
 export const dynamicParams = true;
@@ -29,7 +30,11 @@ async function fetchAllBlogParams(): Promise<{ id: string; slug: string }[]> {
 
 export async function generateStaticParams() {
   const blogs = await fetchAllBlogParams();
-  return blogs.map((blog) => ({ id: `${blog.id}-${blog.slug}` }));
+  // Merged duplicates 301 before the page renders, so pre-building them would
+  // spend build time on pages that only redirect.
+  return blogs
+    .filter((blog) => !MERGED_IDS.has(blog.id))
+    .map((blog) => ({ id: `${blog.id}-${blog.slug}` }));
 }
 
 interface Props {
