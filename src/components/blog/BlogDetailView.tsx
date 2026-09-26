@@ -136,9 +136,15 @@ export default function BlogDetailView({ blog, otherArticles, relatedBlogs }: Bl
       <Box sx={{ bgcolor: 'background.paper', borderBottom: 1, borderColor: 'divider' }}>
         <Container maxWidth="lg" sx={{ pt: 4, pb: 6 }}>
           <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} sx={{ mb: 4 }}><MuiLink component={Link} href="/" underline="hover" color="text.secondary">Home</MuiLink><MuiLink component={Link} href="/blogs" underline="hover" color="text.secondary">Blogs</MuiLink><MuiLink component={Link} href={`/blogs?category=${blog.category.slug}`} underline="hover" color="text.secondary">{blog.category.name}</MuiLink><Typography color="text.primary">{blog.title.length > 30 ? `${blog.title.slice(0, 30)}...` : blog.title}</Typography></Breadcrumbs>
-          {/* Leaderboard above the headline. minHeight reserves the space before the
-              unit fills, so the title does not jump once the ad loads. */}
-          <AdSlot slot={ADSENSE_SLOT_ARTICLE_TOP} minHeight={100} format="auto" />
+          {/*
+            Leaderboard above the headline.
+            "horizontal" rather than "auto" on purpose: auto let AdSense serve a
+            300x250 on mobile into a 100px reservation, so the filled ad shoved the
+            H1 down and Lighthouse measured CLS 0.193 against that heading alone.
+            Horizontal restricts it to banner shapes (320x50, 320x100, 728x90),
+            which fit the space that is actually reserved.
+          */}
+          <AdSlot slot={ADSENSE_SLOT_ARTICLE_TOP} minHeight={100} format="horizontal" />
           <Chip label={blog.category.name} size="small" component={Link} href={`/blogs?category=${blog.category.slug}`} clickable sx={{ bgcolor: blog.category.color, color: 'white', fontWeight: 700, mb: 2 }} />
           <Typography variant="h1" sx={{ fontWeight: 800, fontSize: { xs: '2rem', md: '3rem' }, lineHeight: 1.15, letterSpacing: '-0.03em', mb: 3 }}>{blog.title}</Typography>
           <Typography variant="h6" color="text.secondary" sx={{ lineHeight: 1.7, mb: 4 }}>{blog.excerpt}</Typography>
