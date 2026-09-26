@@ -183,7 +183,7 @@ export default function BlogDetailView({ blog, otherArticles, relatedBlogs }: Bl
             <Grid size={{ xs: 12, lg: 9 }}>
               {blog.featuredImage && (
                 <Box sx={{ width: '100%', borderRadius: 3, mb: 5, height: 480, overflow: 'hidden', boxShadow: 4 }}>
-                  <BlogImage src={blog.featuredImage} alt={blog.title} priority />
+                  <BlogImage src={blog.featuredImage} alt={blog.title} priority sizes="(max-width: 1200px) 100vw, 955px" />
                 </Box>
               )}
               <BlogContentRenderer content={blog.content} />
@@ -237,7 +237,7 @@ export default function BlogDetailView({ blog, otherArticles, relatedBlogs }: Bl
                           <Card elevation={0} sx={{ height: '100%', border: '1px solid', borderColor: 'divider', borderRadius: 3, transition: 'all 0.2s', '&:hover': { boxShadow: 4, transform: 'translateY(-4px)' } }}>
                             <CardActionArea component={Link} href={`/blogs/${article.id}-${article.slug}`} sx={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
                               <Box sx={{ height: 160, overflow: 'hidden', flexShrink: 0 }}>
-                                <BlogImage src={article.thumbnail} alt={article.title} />
+                                <BlogImage src={article.thumbnail} alt={article.title} sizes="96px" />
                               </Box>
                               <CardContent sx={{ flexGrow: 1, p: 2.5 }}>
                                 <Chip label={article.category.name} size="small" sx={{ mb: 1.5, bgcolor: article.category.color, color: 'white', fontWeight: 700, fontSize: '0.7rem' }} />
@@ -271,7 +271,7 @@ export default function BlogDetailView({ blog, otherArticles, relatedBlogs }: Bl
                       {otherArticles.map(article => (
                         <Stack key={article.id} direction="row" spacing={2} sx={{ alignItems: 'flex-start' }}>
                           <Box sx={{ width: 72, height: 56, borderRadius: 0.5, overflow: 'hidden', flexShrink: 0 }}>
-                            <BlogImage src={article.thumbnail} alt={article.title} />
+                            <BlogImage src={article.thumbnail} alt={article.title} sizes="96px" />
                           </Box>
                           <Box>
                             <Typography variant="body2" component={Link} href={`/blogs/${article.id}-${article.slug}`} sx={{ fontWeight: 600, textDecoration: 'none', color: 'text.primary', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.4, mb: 0.5, '&:hover': { color: 'primary.main' } }}>{article.title}</Typography>

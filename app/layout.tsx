@@ -52,7 +52,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://www.googletagmanager.com" />
-        <link rel="preconnect" href="https://images.unsplash.com" />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
         {/* Google Tag Manager */}
         {GTM_CONTAINER_ID && (

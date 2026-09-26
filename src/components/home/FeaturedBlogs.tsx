@@ -120,7 +120,7 @@ export default function FeaturedBlogs({ blogs, isLoading }: FeaturedBlogsProps) 
                     borderColor: 'divider',
                   }}
                 >
-                  <BlogImage src={lead.featuredImage || lead.thumbnail} alt={lead.title} />
+                  <BlogImage src={lead.featuredImage || lead.thumbnail} alt={lead.title} priority sizes="(max-width: 900px) 100vw, 640px" />
                   <Box
                     sx={{
                       position: 'absolute',
@@ -280,7 +280,7 @@ export default function FeaturedBlogs({ blogs, isLoading }: FeaturedBlogsProps) 
                           borderColor: 'divider',
                         }}
                       >
-                        <BlogImage src={blog.thumbnail} alt={blog.title} />
+                        <BlogImage src={blog.thumbnail} alt={blog.title} sizes="(max-width: 900px) 50vw, 320px" />
                       </Box>
                     )}
                   </Box>

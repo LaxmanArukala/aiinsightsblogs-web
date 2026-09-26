@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Box, Typography } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material';
 
@@ -9,6 +10,12 @@ interface BlogImageProps {
   alt: string;
   sx?: SxProps<Theme>;
   priority?: boolean;
+  /**
+   * The rendered width at each breakpoint, so the browser can pick a variant
+   * instead of downloading the 1200x630 original. Without it every thumbnail
+   * pulls the full-size card.
+   */
+  sizes?: string;
 }
 
 function Fallback() {
@@ -68,21 +75,32 @@ function Fallback() {
   );
 }
 
-export default function BlogImage({ src, alt, sx, priority = false }: Readonly<BlogImageProps>) {
+export default function BlogImage({
+  src,
+  alt,
+  sx,
+  priority = false,
+  sizes = '(max-width: 900px) 100vw, 400px',
+}: Readonly<BlogImageProps>) {
   const [errored, setErrored] = useState(false);
 
   if (!src || errored) {
     return <Box sx={{ width: '100%', height: '100%', ...sx }}><Fallback /></Box>;
   }
 
+  // `fill` needs a positioned ancestor; every caller already clips this in a
+  // sized, overflow-hidden box, so the wrapper only has to establish position.
   return (
-    <Box
-      component="img"
-      src={src}
-      alt={alt}
-      onError={() => setErrored(true)}
-      fetchPriority={priority ? 'high' : 'auto'}
-      sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', ...sx }}
-    />
+    <Box sx={{ position: 'relative', width: '100%', height: '100%', ...sx }}>
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        sizes={sizes}
+        priority={priority}
+        onError={() => setErrored(true)}
+        style={{ objectFit: 'cover', display: 'block' }}
+      />
+    </Box>
   );
 }

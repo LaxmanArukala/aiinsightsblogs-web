@@ -90,7 +90,8 @@ function ArticleRow({ blog }: { blog: Blog }) {
         <BlogImage
           src={blog.thumbnail}
           alt={blog.title}
-          sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain' }}
+          sizes="(max-width: 900px) 100vw, 320px"
+          sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
         />
       </Box>
 
